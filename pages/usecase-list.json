@@ -283,10 +283,17 @@
               "autoFillHeight": true,
               "columns": [
                 {
+                  "name": "id",
+                  "label": "id",
+                  "type": "text",
+                  "id": "u:fd1e6451517d",
+                  "placeholder": "-"
+                },
+                {
                   "name": "usecaseName",
                   "label": "用例名",
                   "type": "text",
-                  "id": "u:fd1e6451517d",
+                  "id": "u:066178126086",
                   "placeholder": "-"
                 },
                 {
@@ -311,14 +318,14 @@
                   "placeholder": "-"
                 },
                 {
-                  "type": "date",
+                  "type": "text",
                   "name": "version",
                   "id": "u:c86af15a9b80",
                   "placeholder": "-",
                   "label": "脚本版本"
                 },
                 {
-                  "type": "date",
+                  "type": "text",
                   "label": "最后执行时间",
                   "name": "lastExecuteTime",
                   "id": "u:5b372b330fbb",
@@ -327,7 +334,7 @@
                 {
                   "type": "text",
                   "label": "执行情况",
-                  "name": "executeResult",
+                  "name": "status",
                   "id": "u:1f541753b362",
                   "placeholder": "-"
                 },
