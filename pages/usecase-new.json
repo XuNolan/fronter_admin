@@ -1,0 +1,151 @@
+{
+  "type": "page",
+  "title": "新增用例",
+  "body": [
+    {
+      "id": "u:458aa437ac9b",
+      "type": "form",
+      "title": "表单",
+      "mode": "flex",
+      "labelAlign": "top",
+      "dsType": "api",
+      "feat": "Insert",
+      "body": [
+        {
+          "type": "fieldset",
+          "title": "用例信息",
+          "collapsable": true,
+          "body": [
+            {
+              "type": "input-text",
+              "label": "用例名",
+              "name": "usecaseName",
+              "id": "u:efea041e130e",
+              "maxLength": 20,
+              "clearable": true,
+              "value": "",
+              "required": true,
+              "showCounter": true,
+              "mode": "horizontal",
+              "labelAlign": "left"
+            },
+            {
+              "type": "input-text",
+              "label": "用例描述",
+              "name": "usecaseDescription",
+              "id": "u:8053900f550b",
+              "maxLength": 100,
+              "showCounter": true,
+              "required": true,
+              "mode": "horizontal",
+              "labelAlign": "left"
+            }
+          ],
+          "row": 0,
+          "id": "u:77c8fcbedfba"
+        },
+        {
+          "type": "fieldset",
+          "title": "用例脚本信息",
+          "collapsable": true,
+          "body": [
+            {
+              "type": "input-text",
+              "label": "脚本名",
+              "name": "scriptName",
+              "id": "u:698cbd6cc3ee",
+              "mode": "horizontal",
+              "labelAlign": "left",
+              "required": true
+            },
+            {
+              "type": "input-text",
+              "label": "用例脚本描述",
+              "name": "scriptDescription",
+              "id": "u:1fd79c352a34",
+              "mode": "horizontal",
+              "labelAlign": "left",
+              "value": ""
+            },
+            {
+              "type": "input-text",
+              "label": "版本号",
+              "name": "scriptVersion",
+              "id": "u:09290fa6904e",
+              "required": true,
+              "validateOnChange": false,
+              "mode": "horizontal",
+              "labelAlign": "left",
+              "labelRemark": {
+                "icon": "fa fa-question-circle",
+                "trigger": [
+                  "hover"
+                ],
+                "className": "Remark--warning",
+                "placement": "top",
+                "title": "",
+                "content": "每个用例对应的脚本仅有唯一的版本号。"
+              }
+            },
+            {
+              "type": "editor",
+              "label": "脚本数据",
+              "name": "scriptData",
+              "id": "u:bf567cc1e128",
+              "language": "plaintext",
+              "required": true
+            }
+          ],
+          "row": 1,
+          "id": "u:61165fff4294"
+        }
+      ],
+      "api": {
+        "url": "http://127.0.0.1/usecase/save",
+        "method": "get"
+      },
+      "actions": [
+        {
+          "type": "button",
+          "label": "测试",
+          "onEvent": {
+            "click": {
+              "actions": [
+                {
+                  "actionType": "submit",
+                  "componentId": "u:458aa437ac9b"
+                }
+              ]
+            }
+          },
+          "level": "primary",
+          "id": "u:3ce3b2380a95"
+        },
+        {
+          "type": "button",
+          "label": "提交",
+          "onEvent": {
+            "click": {
+              "actions": [
+                {
+                  "actionType": "submit",
+                  "componentId": "u:458aa437ac9b"
+                }
+              ]
+            }
+          },
+          "level": "primary",
+          "id": "u:8d09f621a0be"
+        }
+      ],
+      "resetAfterSubmit": true,
+      "preventEnterSubmit": true,
+      "debug": false
+    }
+  ],
+  "id": "u:86e6adf68981",
+  "asideResizor": false,
+  "pullRefresh": {
+    "disabled": true
+  }
+}

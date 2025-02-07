@@ -1,0 +1,438 @@
+{
+  "type": "page",
+  "title": "主界面",
+  "body": [
+    {
+      "type": "flex",
+      "items": [
+        {
+          "type": "container",
+          "body": [
+            {
+              "type": "flex",
+              "items": [
+                {
+                  "type": "container",
+                  "body": [
+                    {
+                      "type": "flex",
+                      "items": [
+                        {
+                          "type": "container",
+                          "body": [
+                            {
+                              "type": "flex",
+                              "items": [
+                                {
+                                  "type": "container",
+                                  "body": [
+                                    {
+                                      "type": "fieldset",
+                                      "title": "执行面板",
+                                      "collapsable": true,
+                                      "body": [
+                                        {
+                                          "type": "input-text",
+                                          "label": "当前执行用例名",
+                                          "name": "usecase_name",
+                                          "id": "u:fa19cedd00c5",
+                                          "mode": "horizontal",
+                                          "labelAlign": "left"
+                                        },
+                                        {
+                                          "type": "input-text",
+                                          "label": "当前执行用例简介",
+                                          "name": "usecase_description",
+                                          "id": "u:803748886870",
+                                          "mode": "horizontal",
+                                          "labelAlign": "left"
+                                        }
+                                      ],
+                                      "id": "u:b1cb4131aa44"
+                                    }
+                                  ],
+                                  "size": "none",
+                                  "style": {
+                                    "position": "static",
+                                    "display": "block",
+                                    "flex": "1 1 auto",
+                                    "flexGrow": 1,
+                                    "flexBasis": "0px"
+                                  },
+                                  "wrapperBody": false,
+                                  "isFixedHeight": false,
+                                  "isFixedWidth": false,
+                                  "id": "u:4188581d94dd"
+                                }
+                              ],
+                              "style": {
+                                "position": "relative",
+                                "rowGap": "10px",
+                                "columnGap": "10px",
+                                "flexWrap": "nowrap",
+                                "inset": "auto"
+                              },
+                              "id": "u:0b6e4fbc2935",
+                              "isFixedHeight": false,
+                              "isFixedWidth": false
+                            },
+                            {
+                              "type": "flex",
+                              "items": [
+                                {
+                                  "type": "container",
+                                  "body": [
+                                    {
+                                      "type": "textarea",
+                                      "label": "脚本信息",
+                                      "name": "textarea",
+                                      "id": "u:4fbb08e5096e",
+                                      "minRows": 3,
+                                      "maxRows": 20
+                                    }
+                                  ],
+                                  "size": "none",
+                                  "style": {
+                                    "position": "static",
+                                    "display": "block",
+                                    "flex": "1 1 auto",
+                                    "flexGrow": 1,
+                                    "flexBasis": "0px"
+                                  },
+                                  "wrapperBody": false,
+                                  "isFixedHeight": false,
+                                  "isFixedWidth": false,
+                                  "id": "u:d603355d951f"
+                                },
+                                {
+                                  "type": "container",
+                                  "body": [
+                                    {
+                                      "type": "textarea",
+                                      "label": "执行日志",
+                                      "name": "textarea",
+                                      "id": "u:128da7baf62d",
+                                      "minRows": 3,
+                                      "maxRows": 20
+                                    }
+                                  ],
+                                  "size": "none",
+                                  "style": {
+                                    "position": "static",
+                                    "display": "block",
+                                    "flex": "1 1 auto",
+                                    "flexGrow": 1,
+                                    "flexBasis": "0px"
+                                  },
+                                  "wrapperBody": false,
+                                  "isFixedHeight": false,
+                                  "isFixedWidth": false,
+                                  "id": "u:1c86346e4493"
+                                }
+                              ],
+                              "style": {
+                                "position": "relative",
+                                "rowGap": "10px",
+                                "columnGap": "10px",
+                                "flexWrap": "nowrap",
+                                "inset": "auto"
+                              },
+                              "id": "u:c43594b43c35",
+                              "isFixedHeight": false,
+                              "isFixedWidth": false
+                            }
+                          ],
+                          "size": "none",
+                          "style": {
+                            "position": "static",
+                            "display": "block",
+                            "flex": "1 1 auto",
+                            "flexGrow": 1,
+                            "flexBasis": "0px"
+                          },
+                          "wrapperBody": false,
+                          "isFixedHeight": false,
+                          "isFixedWidth": false,
+                          "id": "u:ec40eb2fc88b"
+                        }
+                      ],
+                      "style": {
+                        "position": "relative",
+                        "rowGap": "10px",
+                        "columnGap": "10px",
+                        "flexWrap": "nowrap",
+                        "inset": "auto"
+                      },
+                      "id": "u:d28202b8eda0",
+                      "isFixedHeight": false,
+                      "isFixedWidth": false
+                    }
+                  ],
+                  "size": "none",
+                  "style": {
+                    "position": "static",
+                    "display": "block",
+                    "flex": "1 1 auto",
+                    "flexGrow": 1,
+                    "flexBasis": "0px"
+                  },
+                  "wrapperBody": false,
+                  "isFixedHeight": false,
+                  "isFixedWidth": false,
+                  "id": "u:c53c66e3ccfb"
+                }
+              ],
+              "style": {
+                "position": "relative",
+                "rowGap": "10px",
+                "columnGap": "10px",
+                "flexWrap": "nowrap",
+                "inset": "auto"
+              },
+              "id": "u:62981bbf19ca",
+              "isFixedHeight": false,
+              "isFixedWidth": false,
+              "themeCss": {
+                "baseControlClassName": {
+                  "border:default": {
+                    "bottom-border-style": "var(--borders-style-2)",
+                    "bottom-border-color": "var(--colors-neutral-text-2)"
+                  },
+                  "padding-and-margin:default": {
+                    "marginTop": "var(--sizes-base-27)",
+                    "marginRight": "var(--sizes-base-27)",
+                    "marginBottom": "var(--sizes-base-27)",
+                    "marginLeft": "var(--sizes-base-27)"
+                  }
+                }
+              }
+            }
+          ],
+          "size": "none",
+          "style": {
+            "position": "static",
+            "display": "block",
+            "flex": "1 1 auto",
+            "flexGrow": 1,
+            "flexBasis": "0px"
+          },
+          "wrapperBody": false,
+          "isFixedHeight": false,
+          "isFixedWidth": false,
+          "id": "u:01a86d3698f3"
+        }
+      ],
+      "style": {
+        "position": "relative",
+        "rowGap": "10px",
+        "columnGap": "10px",
+        "flexWrap": "nowrap",
+        "inset": "auto"
+      },
+      "id": "u:c2442c77f607",
+      "isFixedHeight": false,
+      "isFixedWidth": false
+    },
+    {
+      "type": "flex",
+      "items": [
+        {
+          "type": "container",
+          "body": [
+            {
+              "type": "alert",
+              "body": [
+                {
+                  "type": "tpl",
+                  "tpl": "若用例对应脚本为空，代表此用例没有启用的脚本。请在用例详情界面启用用例对应的脚本。",
+                  "wrapperComponent": "",
+                  "inline": false,
+                  "id": "u:528226633b35",
+                  "wrapperCustomStyle": {}
+                }
+              ],
+              "level": "info",
+              "id": "u:ba6a5e7acde4",
+              "showIcon": true,
+              "showCloseButton": false
+            },
+            {
+              "type": "crud",
+              "syncLocation": false,
+              "api": {
+                "method": "get",
+                "url": "http://127.0.0.1:8080/usecase/list"
+              },
+              "bulkActions": [
+                {
+                  "label": "批量执行",
+                  "type": "button",
+                  "id": "u:eda2dd41fd5e"
+                }
+              ],
+              "itemActions": [],
+              "id": "u:8a34c92f4ee9",
+              "perPageAvailable": [
+                5,
+                10,
+                20,
+                50,
+                100
+              ],
+              "messages": {},
+              "autoFillHeight": true,
+              "columns": [
+                {
+                  "name": "usecaseName",
+                  "label": "用例名",
+                  "type": "text",
+                  "id": "u:fd1e6451517d",
+                  "placeholder": "-"
+                },
+                {
+                  "type": "text",
+                  "label": "用例简介",
+                  "name": "usecaseDescription",
+                  "id": "u:459a2ca41923",
+                  "placeholder": "-"
+                },
+                {
+                  "type": "text",
+                  "label": "脚本名",
+                  "name": "scriptName",
+                  "id": "u:fa6ac747ecea",
+                  "placeholder": "-"
+                },
+                {
+                  "type": "text",
+                  "label": "脚本简介",
+                  "name": "scriptDescription",
+                  "id": "u:afbbd314b269",
+                  "placeholder": "-"
+                },
+                {
+                  "type": "date",
+                  "name": "version",
+                  "id": "u:c86af15a9b80",
+                  "placeholder": "-",
+                  "label": "脚本版本"
+                },
+                {
+                  "type": "date",
+                  "label": "最后执行时间",
+                  "name": "lastExecuteTime",
+                  "id": "u:5b372b330fbb",
+                  "placeholder": "-"
+                },
+                {
+                  "type": "text",
+                  "label": "执行情况",
+                  "name": "executeResult",
+                  "id": "u:1f541753b362",
+                  "placeholder": "-"
+                },
+                {
+                  "type": "operation",
+                  "label": "操作",
+                  "buttons": [
+                    {
+                      "type": "button-group",
+                      "buttons": [
+                        {
+                          "type": "button",
+                          "label": "查看详情",
+                          "id": "u:1f56a9e74711",
+                          "link": "/usecase/query/{$id}"
+                        },
+                        {
+                          "type": "button",
+                          "label": "测试",
+                          "id": "u:809d0104a090"
+                        },
+                        {
+                          "type": "button",
+                          "label": "删除",
+                          "id": "u:d324dc44c7bc",
+                          "level": "danger",
+                          "actionType": "ajax",
+                          "confirmText": "您确认要删除?",
+                          "api": "delete:http://localhost:8080/usecase/delete/${id}"
+                        }
+                      ],
+                      "id": "u:0b50227ae35b"
+                    }
+                  ],
+                  "id": "u:5fa74ab5f0d5",
+                  "placeholder": "-"
+                }
+              ],
+              "filter": {
+                "id": "u:70b56575375b",
+                "feat": "Insert",
+                "title": "",
+                "mode": "inline",
+                "wrapWithPanel": false,
+                "submitText": "",
+                "className": "m-b-sm",
+                "body": [
+                  {
+                    "type": "input-text",
+                    "name": "keywords",
+                    "placeholder": "用例名关键字",
+                    "addOn": {
+                      "label": "搜索",
+                      "type": "submit",
+                      "className": "btn-success",
+                      "id": "u:3cdffacd5c4c"
+                    },
+                    "clearable": true,
+                    "size": "lg",
+                    "id": "u:2946ae366a18"
+                  }
+                ]
+              },
+              "headerToolbar": [
+                {
+                  "label": "新增",
+                  "type": "button",
+                  "actionType": "link",
+                  "level": "primary",
+                  "id": "u:af822500b5ed",
+                  "link": "/save"
+                },
+                "bulkActions"
+              ]
+            }
+          ],
+          "size": "none",
+          "style": {
+            "position": "static",
+            "display": "block",
+            "flex": "1 1 auto",
+            "flexGrow": 1,
+            "flexBasis": "0px"
+          },
+          "wrapperBody": false,
+          "isFixedHeight": false,
+          "isFixedWidth": false,
+          "id": "u:6c0d993255cd"
+        }
+      ],
+      "style": {
+        "position": "relative",
+        "rowGap": "10px",
+        "columnGap": "10px",
+        "flexWrap": "nowrap",
+        "inset": "auto"
+      },
+      "id": "u:f1aedd33abe4",
+      "isFixedHeight": false,
+      "isFixedWidth": false
+    }
+  ],
+  "id": "u:b5c62691cc1b",
+  "asideResizor": false,
+  "pullRefresh": {
+    "disabled": true
+  }
+}
