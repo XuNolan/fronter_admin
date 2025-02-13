@@ -406,7 +406,7 @@
                   "actionType": "link",
                   "level": "primary",
                   "id": "u:af822500b5ed",
-                  "link": "/save"
+                  "link": "/usecase/new"
                 },
                 "bulkActions"
               ]

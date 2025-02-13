@@ -101,8 +101,8 @@
         }
       ],
       "api": {
-        "url": "http://127.0.0.1/usecase/save",
-        "method": "get"
+        "url": "http://127.0.0.1:8080/usecase/save",
+        "method": "post"
       },
       "actions": [
         {
