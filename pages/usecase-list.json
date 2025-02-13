@@ -363,8 +363,8 @@
                           "id": "u:d324dc44c7bc",
                           "level": "danger",
                           "actionType": "ajax",
-                          "confirmText": "您确认要删除?",
-                          "api": "delete:http://localhost:8080/usecase/delete/${id}"
+                          "confirmText": "删除用例将删除所有下属脚本数据，您确认要删除?",
+                          "api": "delete:http://localhost:8080/usecase/delete?id=${id}"
                         }
                       ],
                       "id": "u:0b50227ae35b"
