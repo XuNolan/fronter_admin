@@ -141,6 +141,20 @@
       "resetAfterSubmit": true,
       "preventEnterSubmit": true,
       "debug": false
+    },
+    {
+      "type": "alert",
+      "body": [
+        {
+          "type": "tpl",
+          "tpl": "提交之后默认不启用脚本。若需启用脚本，请在用例详情页确认启用。",
+          "wrapperComponent": "",
+          "inline": false,
+          "id": "u:4852a108b427"
+        }
+      ],
+      "level": "info",
+      "id": "u:fcaaea2a8953"
     }
   ],
   "id": "u:86e6adf68981",
