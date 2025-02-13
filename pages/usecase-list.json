@@ -349,7 +349,8 @@
                           "type": "button",
                           "label": "查看详情",
                           "id": "u:1f56a9e74711",
-                          "link": "/usecase/query/{$id}"
+                          "actionType": "link",
+                          "link": "/usecase/query/${id}"
                         },
                         {
                           "type": "button",

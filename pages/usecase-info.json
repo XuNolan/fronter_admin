@@ -1,0 +1,403 @@
+{
+  "type": "page",
+  "title": "用例详情",
+  "body": [
+    {
+      "type": "service",
+      "body": [
+        {
+          "type": "fieldset",
+          "id": "u:1e904e53f6c3",
+          "title": "用例信息",
+          "collapsable": true,
+          "body": [
+            {
+              "type": "input-text",
+              "label": "用例名",
+              "name": "name",
+              "id": "u:1b8420420b1e",
+              "mode": "horizontal",
+              "labelAlign": "left",
+              "size": "sm"
+            },
+            {
+              "type": "input-text",
+              "label": "用例描述",
+              "name": "description",
+              "id": "u:df4123cb12e1",
+              "mode": "horizontal",
+              "labelAlign": "left"
+            },
+            {
+              "type": "input-text",
+              "label": "创建时间",
+              "name": "created",
+              "id": "u:30e13e6cb305",
+              "size": "sm",
+              "mode": "horizontal",
+              "labelAlign": "left",
+              "themeCss": {
+                "labelClassName": {
+                  "font:default": {
+                    "lineHeight": "var(--fonts-lineHeight-1)"
+                  }
+                }
+              }
+            },
+            {
+              "type": "input-text",
+              "label": "修改时间",
+              "name": "updated",
+              "id": "u:85e33276ab03",
+              "size": "sm",
+              "labelWidth": "var(--sizes-size-1)",
+              "mode": "horizontal",
+              "labelAlign": "right"
+            },
+            {
+              "type": "button-group",
+              "buttons": [
+                {
+                  "type": "button",
+                  "label": "新增脚本",
+                  "onEvent": {
+                    "click": {
+                      "actions": []
+                    }
+                  },
+                  "id": "u:7a95c75101f8",
+                  "level": "primary",
+                  "themeCss": {
+                    "className": {
+                      "padding-and-margin:default": {
+                        "marginTop": "var(--sizes-size-6)",
+                        "marginRight": "var(--sizes-size-6)",
+                        "marginBottom": "var(--sizes-size-6)",
+                        "marginLeft": "var(--sizes-size-6)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "label": "编辑",
+                  "onEvent": {
+                    "click": {
+                      "actions": []
+                    }
+                  },
+                  "id": "u:9bc376403723",
+                  "level": "primary",
+                  "themeCss": {
+                    "className": {
+                      "padding-and-margin:default": {
+                        "marginTop": "var(--sizes-size-6)",
+                        "marginRight": "var(--sizes-size-6)",
+                        "marginBottom": "var(--sizes-size-6)",
+                        "marginLeft": "var(--sizes-size-6)"
+                      }
+                    }
+                  }
+                }
+              ],
+              "id": "u:31ffca699d2d",
+              "tiled": false,
+              "vertical": false
+            }
+          ]
+        },
+        {
+          "type": "service",
+          "id": "u:44dca40ea919",
+          "title": "脚本信息",
+          "collapsable": true,
+          "body": [
+            {
+              "type": "crud",
+              "id": "u:57b779f742d9",
+              "syncLocation": false,
+              "api": {
+                "method": "get",
+                "url": "http://127.0.0.1:8080/script/list?usecaseId=$id"
+              },
+              "bulkActions": [],
+              "itemActions": [],
+              "columns": [
+                {
+                  "name": "scriptId",
+                  "label": "脚本id",
+                  "type": "text",
+                  "id": "u:bfb0a0898284",
+                  "placeholder": "-",
+                  "quickEdit": false,
+                  "visible": false
+                },
+                {
+                  "name": "scriptName",
+                  "label": "脚本名",
+                  "type": "text",
+                  "id": "u:5235bd553321",
+                  "placeholder": "-",
+                  "quickEdit": false
+                },
+                {
+                  "name": "version",
+                  "label": "版本号",
+                  "type": "text",
+                  "id": "u:45a69d781208",
+                  "placeholder": "-",
+                  "quickEdit": false
+                },
+                {
+                  "name": "isActive",
+                  "label": "是否启用",
+                  "type": "text",
+                  "id": "u:6558319861a1",
+                  "placeholder": "-",
+                  "quickEdit": false
+                },
+                {
+                  "type": "operation",
+                  "label": "操作",
+                  "buttons": [
+                    {
+                      "type": "button-group",
+                      "buttons": [
+                        {
+                          "type": "button",
+                          "label": "查看详情",
+                          "id": "u:1f56a9e74711",
+                          "onEvent": {
+                            "click": {
+                              "weight": 0,
+                              "actions": [
+                                {
+                                  "componentId": "u:080610347bde",
+                                  "ignoreError": false,
+                                  "actionType": "setValue",
+                                  "args": {
+                                    "value": {
+                                      "scriptId": "${scriptId}"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ],
+                      "id": "u:0b50227ae35b"
+                    }
+                  ],
+                  "id": "u:5fa74ab5f0d5",
+                  "placeholder": "-"
+                }
+              ],
+              "perPageAvailable": [
+                5,
+                10,
+                20,
+                50,
+                100
+              ],
+              "messages": {},
+              "initFetch": "",
+              "filter": {
+                "title": "查询条件",
+                "body": [
+                  {
+                    "type": "input-text",
+                    "name": "usecase_name",
+                    "label": "脚本名",
+                    "id": "u:cb1faa247032"
+                  },
+                  {
+                    "type": "submit",
+                    "label": "搜索",
+                    "primary": true,
+                    "id": "u:955634ef16bc"
+                  }
+                ],
+                "id": "u:4ad29892f6b0",
+                "feat": "Insert",
+                "labelAlign": "left",
+                "visible": true
+              },
+              "initFetchOn": "id!=null"
+            },
+            {
+              "type": "service",
+              "id": "u:080610347bde",
+              "body": [
+                {
+                  "type": "input-text",
+                  "label": "脚本id",
+                  "name": "scriptId",
+                  "id": "u:b106781f4f12",
+                  "mode": "horizontal",
+                  "labelAlign": "left",
+                  "hidden": true
+                },
+                {
+                  "type": "input-text",
+                  "label": "脚本名",
+                  "name": "script_name",
+                  "id": "u:f69d3e36552c",
+                  "mode": "horizontal",
+                  "labelAlign": "left"
+                },
+                {
+                  "type": "input-text",
+                  "label": "版本",
+                  "name": "script_version",
+                  "id": "u:c9fbf64b44b4",
+                  "mode": "horizontal",
+                  "labelAlign": "left"
+                },
+                {
+                  "type": "input-text",
+                  "label": "脚本描述",
+                  "name": "script_description",
+                  "id": "u:f040cea00a37",
+                  "mode": "horizontal",
+                  "labelAlign": "left"
+                },
+                {
+                  "type": "input-text",
+                  "label": "脚本创建时间",
+                  "name": "script_created",
+                  "id": "u:6eac7a88b7fd",
+                  "mode": "horizontal",
+                  "labelAlign": "left"
+                },
+                {
+                  "type": "input-text",
+                  "label": "脚本修改时间",
+                  "name": "script_updated",
+                  "id": "u:45997a6555d7",
+                  "mode": "horizontal",
+                  "labelAlign": "left"
+                },
+                {
+                  "type": "input-text",
+                  "label": "脚本代码内容",
+                  "name": "script_data",
+                  "id": "u:4495db403feb",
+                  "mode": "normal",
+                  "labelAlign": "top"
+                },
+                {
+                  "type": "button",
+                  "label": "编辑",
+                  "onEvent": {
+                    "click": {
+                      "actions": []
+                    }
+                  },
+                  "id": "u:240827afc81f",
+                  "level": "primary",
+                  "themeCss": {
+                    "className": {
+                      "padding-and-margin:default": {
+                        "paddingTop": "var(--sizes-size-6)",
+                        "paddingRight": "var(--sizes-size-6)",
+                        "paddingBottom": "var(--sizes-size-6)",
+                        "paddingLeft": "var(--sizes-size-6)",
+                        "marginTop": "var(--sizes-size-6)",
+                        "marginRight": "var(--sizes-size-6)",
+                        "marginBottom": "var(--sizes-size-6)",
+                        "marginLeft": "var(--sizes-size-6)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "label": "测试",
+                  "onEvent": {
+                    "click": {
+                      "actions": []
+                    }
+                  },
+                  "id": "u:99620a03dd6a",
+                  "level": "primary",
+                  "themeCss": {
+                    "className": {
+                      "padding-and-margin:default": {
+                        "paddingTop": "var(--sizes-size-6)",
+                        "paddingRight": "var(--sizes-size-6)",
+                        "paddingBottom": "var(--sizes-size-6)",
+                        "paddingLeft": "var(--sizes-size-6)",
+                        "marginTop": "var(--sizes-size-6)",
+                        "marginRight": "var(--sizes-size-6)",
+                        "marginBottom": "var(--sizes-size-6)",
+                        "marginLeft": "var(--sizes-size-6)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "label": "启用当前脚本",
+                  "onEvent": {
+                    "click": {
+                      "actions": []
+                    }
+                  },
+                  "id": "u:517bc5faf9f7",
+                  "level": "primary",
+                  "themeCss": {
+                    "className": {
+                      "padding-and-margin:default": {
+                        "marginTop": "var(--sizes-size-6)",
+                        "marginRight": "var(--sizes-size-6)",
+                        "marginBottom": "var(--sizes-size-6)",
+                        "marginLeft": "var(--sizes-size-6)",
+                        "paddingTop": "var(--sizes-size-6)",
+                        "paddingRight": "var(--sizes-size-6)",
+                        "paddingBottom": "var(--sizes-size-6)",
+                        "paddingLeft": "var(--sizes-size-6)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "alert",
+                  "body": [
+                    {
+                      "type": "tpl",
+                      "tpl": "启用当前脚本后，执行用例将默认执行此脚本。原有脚本将被弃用。",
+                      "wrapperComponent": "",
+                      "inline": false,
+                      "id": "u:edf7320913df"
+                    }
+                  ],
+                  "level": "info",
+                  "id": "u:d725279c605c",
+                  "showIcon": true,
+                  "visible": true,
+                  "hidden": false
+                }
+              ],
+              "dsType": "api",
+              "api": "http://127.0.0.1:8080/script/info/${scriptId}",
+              "initFetchOn": "scriptId!=null",
+              "method": "get"
+            }
+          ],
+          "dsType": "api"
+        }
+      ],
+      "id": "u:4e56d7183a4f",
+      "dsType": "api",
+      "initFetchSchema": false,
+      "api": "http://127.0.0.1:8080/usecase/query/${params.id}"
+    }
+  ],
+  "id": "u:befc1f8cc421",
+  "asideResizor": false,
+  "pullRefresh": {
+    "disabled": true
+  },
+  "definitions": {}
+}
