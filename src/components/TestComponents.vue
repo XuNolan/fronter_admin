@@ -1,9 +1,32 @@
 <template>
-  <div>
-    <a>pathid={{pathdata}}</a>
-  </div>
   <div ref="script_base_info">
+    <fieldset>
+      <legend>用例信息</legend>
+      <div>
+        <label for="usecaseName">用例名:</label>
+        <input id="usecaseName" v-model="this.scriptBaseInfo.usecaseName">
+      </div>
+      <div>
+        <label for="usecaseDescription">用例描述:</label>
+        <input id="usecaseDescription" v-model="this.scriptBaseInfo.usecaseDescription">
+      </div>
+    </fieldset>
 
+    <fieldset>
+      <legend>脚本信息</legend>
+      <div>
+        <label for="scriptName">脚本名:</label>
+        <input id="scriptName" v-model="this.scriptBaseInfo.scriptName">
+      </div>
+      <div>
+        <label for="scriptDescription">脚本描述:</label>
+        <input id="scriptDescription" v-model="this.scriptBaseInfo.scriptDescription">
+      </div>
+      <div>
+        <label for="version">脚本版本号</label>
+        <input id="version" v-model="this.scriptBaseInfo.version">
+      </div>
+    </fieldset>
   </div>
   <div ref="script_data_info">
     <table class="table">
@@ -44,8 +67,8 @@ let scriptLog;
 export default {
   data(){
     return {
-      scriptIdFromUrl: null,
-      scriptBaseInfo: null,
+      scriptIdFromUrl: ref(null),
+      scriptBaseInfo: ref(null),
       err: null,
 
       scriptData: null,
@@ -116,76 +139,6 @@ function fetchScriptBaseInfo(){
       }).catch(err=> {
         this.err = err;
       });
-}
-
-//实在得不到数据的话看`http://127.0.0.1:8080/script/baseInfo?scriptId=${this.scriptIdFromUrl}`这种格式。
-function displayScriptBaseInfo(){
-  const amis = amisRequire('amis/embed')
-  let scriptInfo = {
-    'type': 'service',
-    'title': '',
-    'body': [
-      {
-        "type": "fieldset",
-        "title": "用例信息",
-        "collapsable": true,
-        "body": [
-          {
-            "type": "input-text",
-            "label": "用例名",
-            "name": "usecaseName",
-            "value": "{{scriptBaseInfo.usecaseName}}",
-            "mode": "horizontal",
-            "labelAlign": "left"
-          },
-          {
-            "type": "input-text",
-            "label": "用例描述",
-            "name": "usecaseDescription",
-            "value": "{{scriptBaseInfo.usecaseDescription}}",
-            "mode": "horizontal",
-            "labelAlign": "left"
-          }
-        ],
-        "row": 0
-      },
-      {
-        "type": "fieldset",
-        "title": "用例脚本信息",
-        "collapsable": true,
-        "body": [
-          {
-            "type": "input-text",
-            "name": "scriptName",
-            "mode": "horizontal",
-            "value": "{{scriptBaseInfo.scriptName}}",
-            "labelAlign": "left",
-            "label": "脚本名"
-          },
-          {
-            "type": "input-text",
-            "label": "用例脚本描述",
-            "name": "scriptDescription",
-            "value": "{{scriptBaseInfo.scriptDescription}}",
-            "mode": "horizontal",
-            "labelAlign": "left",
-          },
-          {
-            "type": "input-text",
-            "label": "版本号",
-            "name": "scriptVersion",
-            "value": "{{scriptBaseInfo.scriptVersion}}",
-            "validateOnChange": false,
-            "mode": "horizontal",
-            "labelAlign": "left"
-          }
-        ],
-        "row": 1,
-      }
-    ],
-    "dsType": "api",
-  }
-  const amisScoped = amis.embed(this.$refs.script_base_info, scriptInfo)
 }
 
 function onWebsocketMessageRecvCallback(jsonMessage){
