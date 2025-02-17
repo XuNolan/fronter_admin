@@ -40,11 +40,6 @@ export default {
                   "label": "用例详情",
                   "url": "/usecase/query/:id",
                   "schemaApi": "get:/pages/usecase-info.json"
-                },{
-                  "type": "button",
-                  "label": "点击跳转到 Vue 页面",
-                  "actionType": "link",
-                  "link": "/pages/vuePage.html"   // 跳转到目标页面
                 }
               ]
             }
