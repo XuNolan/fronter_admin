@@ -355,7 +355,20 @@
                         {
                           "type": "button",
                           "label": "测试",
-                          "id": "u:809d0104a090"
+                          "id": "u:809d0104a090",
+                          "onEvent": {
+                            "click": {
+                              "weight": 0,
+                              "actions": [
+                                {
+                                  "ignoreError": false,
+                                  "script": "const newWindow = window.open('/pages/VuePage.html?id=1', '', 'width=800,height=600');\n\n// 在新窗口中动态设置大小\nnewWindow.resizeTo(2096, 768); // 将新窗口的尺寸调整为 1024x768",
+                                  "actionType": "custom",
+                                  "args": {}
+                                }
+                              ]
+                            }
+                          }
                         },
                         {
                           "type": "button",

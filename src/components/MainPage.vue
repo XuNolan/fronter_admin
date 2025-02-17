@@ -44,7 +44,7 @@ export default {
                   "type": "button",
                   "label": "点击跳转到 Vue 页面",
                   "actionType": "link",
-                  "link": "/pages/vuePage.html?id=1"   // 跳转到目标页面
+                  "link": "/pages/vuePage.html"   // 跳转到目标页面
                 }
               ]
             }
