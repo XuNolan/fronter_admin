@@ -4,11 +4,11 @@
       <legend>用例信息</legend>
       <div>
         <label for="usecaseName">用例名:</label>
-        <input id="usecaseName" v-model="this.scriptBaseInfo.usecaseName">
+        <textarea id="usecaseName">{{scriptBaseInfo != null ? scriptBaseInfo['usecaseName'] : '无'}}</textarea>
       </div>
       <div>
         <label for="usecaseDescription">用例描述:</label>
-        <input id="usecaseDescription" v-model="this.scriptBaseInfo.usecaseDescription">
+        <textarea id="usecaseDescription">{{scriptBaseInfo != null ? scriptBaseInfo['usecaseDescription'] : '无'}}</textarea>
       </div>
     </fieldset>
 
@@ -16,15 +16,15 @@
       <legend>脚本信息</legend>
       <div>
         <label for="scriptName">脚本名:</label>
-        <input id="scriptName" v-model="this.scriptBaseInfo.scriptName">
+        <textarea id="scriptName">{{scriptBaseInfo != null ? scriptBaseInfo['scriptName'] : '无'}}</textarea>
       </div>
       <div>
         <label for="scriptDescription">脚本描述:</label>
-        <input id="scriptDescription" v-model="this.scriptBaseInfo.scriptDescription">
+        <textarea id="scriptDescription">{{scriptBaseInfo != null ? scriptBaseInfo['scriptDescription'] : '无'}}</textarea>
       </div>
       <div>
         <label for="version">脚本版本号</label>
-        <input id="version" v-model="this.scriptBaseInfo.version">
+        <textarea id="version">{{scriptBaseInfo != null ? scriptBaseInfo['version'] : '无'}}</textarea>
       </div>
     </fieldset>
   </div>
@@ -37,15 +37,17 @@
       </tr>
       </thead>
       <tbody>
-      <!-- 根据 data 行数动态渲染表格行 -->
-      <tr v-for="(line, index) in dataLines" :key="index">
+      <!-- 根据 dataLines 渲染每一行 -->
+      <tr v-for="(line, index) in scriptBaseInfo.dataLines" :key="index">
         <td>{{ line }}</td>
-        <td><div>
-          <p><strong>执行信息:</strong> {{ scriptLog[index]?.executeInfo || '无' }}</p>
-          <p><strong>状态:</strong> {{ scriptLog[index]?.status || '无' }}</p>
-          <p><strong>开始时间:</strong> {{ scriptLog[index]?.startTime || '无' }}</p>
-          <p><strong>结束时间:</strong> {{ scriptLog[index]?.endTime || '无' }}</p>
-        </div></td>
+        <td>
+          <div>
+            <div><strong>开始时间:</strong> {{ scriptLog[index]?.startTime || '无' }}</div>
+            <div><strong>结束时间:</strong> {{ scriptLog[index]?.endTime || '无' }}</div>
+            <div><strong>状态:</strong> {{ scriptLog[index]?.status || '未执行' }}</div>
+            <p><strong>执行信息:</strong> {{ scriptLog[index]?.executeInfo || '无' }}</p>
+          </div>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -64,59 +66,80 @@ import {reactive} from "vue";
 
 let scriptLogData = [];
 let scriptLog;
+
+let scriptIdFromUrl;
+
+
 export default {
-  data(){
-    return {
-      scriptIdFromUrl: ref(null),
-      scriptBaseInfo: ref(null),
-      err: null,
-
-      scriptData: null,
-    }
-
-  },
-  computed:{
-    dataLines() {
-      return this.scriptData.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    }
-  },
-  components: {
-
-  },
-
   setup(){
-    this.scriptIdFromUrl = getScriptId();
+    const scriptBaseInfo = reactive({
+      usecaseName: '',
+      usecaseDescription: '',
+      scriptName: '',
+      scriptDescription: '',
+      version: '',
+      dataLines: [],
+    });
+
+    scriptIdFromUrl = getScriptId();
     //请求并获取脚本基础信息
-    if(this.scriptIdFromUrl!=null){
-      fetchScriptBaseInfo();
+    if(scriptIdFromUrl!=null){
+      try {
+        fetchScriptBaseInfo().then(
+            (data) =>{
+              const temp = data['data'];
+              console.log(temp)
+              scriptBaseInfo.usecaseName=temp.usecaseName;
+              scriptBaseInfo.usecaseDescription=temp.usecaseDescription;
+              scriptBaseInfo.scriptName=temp.scriptName;
+              scriptBaseInfo.scriptDescription=temp.scriptDescription;
+              scriptBaseInfo.version=temp.version;
+              temp.data.split('\n').map(
+                  line => {
+                    line.trim()
+                    if(line.length > 0){
+                      scriptBaseInfo.dataLines.push(line);
+                    }
+                  }
+              );
+              console.log(scriptBaseInfo)
+            }
+        )
+        console.log(scriptBaseInfo)
+      }catch(e){
+        window.alert("fetch script info fail");
+        return;
+      }
     } else {
-      this.err = "scriptId is null"
+      window.alert("scriptId is null");
+      return;
     }
     //初始化websocket连接。
-    initWebSocket("ws://127.0.0.1:8080/websocket", onWebsocketMessageRecvCallback);
+    try {
+      initWebSocket("ws://127.0.0.1:8080/websocket", onWebsocketMessageRecvCallback);
+    }catch(e){
+      window.alert("websocket connect failed");
+      return;
+    }
     scriptLog = reactive(scriptLogData);
     return {
       scriptLog,
+      scriptBaseInfo,
     }
   },
   mounted() {
-    //渲染对应信息；
-    displayScriptBaseInfo();
     //基于websocket提示对端开始执行脚本
     webSocket.addEventListener('open', function () {
       let startFeatureRequest = {
         msgType:"process",
         contentType:"script_start",
         content:{
-          scriptId:this.scriptId
+          "scriptId": scriptIdFromUrl.value,
         }
       };
       sendMessage(startFeatureRequest);
     });
   },
-
-  methods: {
-  }
 }
 
 function getScriptId(){
@@ -132,13 +155,12 @@ function getScriptId(){
   return scriptId[scriptId.length-1];
 }
 
-function fetchScriptBaseInfo(){
-  axios.get(`http://127.0.0.1:8080/script/baseInfo?scriptId=${this.scriptIdFromUrl}`)
-      .then(res=>{
-        this.scriptBaseInfo = res;
-      }).catch(err=> {
-        this.err = err;
-      });
+async function fetchScriptBaseInfo(){
+  let res;
+  await axios.get(`http://127.0.0.1:8080/script/testInfo?scriptId=${scriptIdFromUrl}`).then(
+      r =>{ res = r }
+  );
+  return res.data;
 }
 
 function onWebsocketMessageRecvCallback(jsonMessage){
