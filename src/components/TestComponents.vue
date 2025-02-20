@@ -77,13 +77,15 @@
 //在log中，携带此次stepResult的scenarioId和stepid辅助定位。
 
 import axios from 'axios';
-import {initWebSocket, sendMessage, webSocket} from "../js/websocket.js";
+// import {initWebSocket, sendMessage, webSocket} from "../js/websocket.js";
 import {reactive} from "vue";
 
 let scriptLogData = [];
-let scriptLog;
-
+let scenarioBaseInfo = [];
+let executeBaseResults = {};
 let scriptIdFromUrl;
+
+let webSocket;
 
 export default {
   setup(){
@@ -121,71 +123,52 @@ export default {
       window.alert("scriptId is null");
       return;
     }
-    scriptLog = reactive(scriptLogData);
+    const scriptLog = reactive(scriptLogData);
+    const scenarioInfos = reactive(scenarioBaseInfo)
+    const executeResults = reactive(executeBaseResults)
     return {
       scriptLog,
       scriptBaseInfo,
 
-      scenarioInfos: [],
-      executeResults: {},
-      webSocket : null,
+      scenarioInfos,
+      executeResults,
       currentExecution: null,
     }
   },
   mounted() {
-    // if ("WebSocket" in window) {
-    //   this.webSocket = new WebSocket("ws://127.0.0.1:8080/websocket");//创建socket对象
-    // } else {
-    //   console.log(JSON.stringify({message: '该浏览器不支持websocket!', type: 'warning'}));
-    //   throw new Error("websocket unsupported");
-    // }
-    // //基于websocket提示对端开始执行脚本
-    // this.webSocket.onopen = function(){
-    //   console.log('WebSocket connection opened')
-    //   let startFeatureRequest = {
-    //     msgType:"SCRIPTSTART",
-    //     content:{
-    //       "scriptId": scriptIdFromUrl.value,
-    //     }
-    //   };
-    //   this.webSocket.send(JSON.stringify(startFeatureRequest));
-    // };
-    // this.webSocket.onmessage = (event) => {
-    //   const message = JSON.parse(event.data);
-    //   if(message && message.msgType==="karateFeatureInfos"){
-    //     this.handleKarateFeatureInfos(message.content);
-    //   }else if(message && message.msgType==="executeInfos"){
-    //     this.handleExecuteInfos(message.content);
-    //   }
-    // }
-    // this.webSocket.onerror = (error) => {
-    //   console.error('WebSocket error: ', error);
-    // };
-    // this.webSocket.onclose = () => {
-    //   console.log('WebSocket connection closed');
-    // };
-    // window.onunload(()=>{
-    //   this.webSocket.close();
-    // })
-    try {
-      let startFeatureRequest = {
-        msgType: "script_start",
-        content: {
-          "scriptId": scriptIdFromUrl,
-        }
-      }
-      initWebSocket("ws://127.0.0.1:8080/websocket", function(message){
-        console.log("socket recv message result", message)
-        if(message && message.msgType==="karateFeatureInfos"){
-          this.handleKarateFeatureInfos(message.content);
-        }else if(message && message.msgType==="executeInfos"){
-          this.handleExecuteInfos(message.content);
-        }
-      }, startFeatureRequest);
-    }catch(e){
-      window.alert("websocket connect failed");
-      return;
+    if ("WebSocket" in window) {
+      webSocket = new WebSocket("ws://127.0.0.1:8080/websocket");//创建socket对象
+    } else {
+      console.log(JSON.stringify({message: '该浏览器不支持websocket!', type: 'warning'}));
+      throw new Error("websocket unsupported");
     }
+    //基于websocket提示对端开始执行脚本
+    webSocket.onopen = function(){
+      console.log('WebSocket connection opened')
+      let startFeatureRequest = {
+        msgType:"script_start",
+        content:{
+          "scriptId": getScriptId(),
+        }
+      };
+      webSocket.send(JSON.stringify(startFeatureRequest));
+    };
+    webSocket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if(message && message.msgType==="karateFeatureInfos"){
+        console.log(message.content);
+        this.handleKarateFeatureInfos(message.content);
+      }else if(message && message.msgType==="executeInfos"){
+        console.log(message.content);
+        this.handleExecuteInfos(message.content);
+      }
+    }
+    webSocket.onerror = (error) => {
+      console.error('WebSocket error: ', error);
+    };
+    webSocket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
 
   },
   methods:{
@@ -196,14 +179,14 @@ export default {
       const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
 
       // 更新该步骤的执行状态
-      this.$set(this.executeResults, `${scenarioIndex}-${stepIndex}`, {
+      this.executeResults[`${scenarioIndex}-${stepIndex}`] = {
         status,
         durationNanos,
         startTime,
         endTime,
         error,
         aborted,
-      });
+      }
     },
     getStepStatus(scenarioIndex, stepIndex) {
       const status = this.executeResults[`${scenarioIndex}-${stepIndex}`]?.status;
