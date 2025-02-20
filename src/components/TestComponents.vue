@@ -33,38 +33,52 @@
     </fieldset>
   </div>
 
-  <div class="container">
-    <div class="left-panel">
-      <h3>Scenario Steps</h3>
-      <div v-for="(scenario, scenarioIndex) in scenarioInfos" :key="scenarioIndex" class="scenario">
-        <h4>{{ scenario.scenarioName }}</h4>
-        <ul>
-          <li v-for="(step, stepIndex) in scenario.stepInfos" :key="stepIndex">
-            <strong>{{ step.stepString }}</strong>
-            <span> - </span>
-            <span :class="stepStatusClass(scenarioIndex, stepIndex)">
-              {{ getStepStatus(scenarioIndex, stepIndex) }}
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="right-panel">
-      <h3>Execution Status</h3>
-      <div v-if="currentExecution">
-        <p><strong>Status:</strong> {{ currentExecution.status }}</p>
-        <p><strong>Duration:</strong> {{ currentExecution.durationNanos }} ns</p>
-        <p><strong>Start Time:</strong> {{ formatTime(currentExecution.startTime) }}</p>
-        <p><strong>End Time:</strong> {{ formatTime(currentExecution.endTime) }}</p>
-        <p v-if="currentExecution.error"><strong>Error:</strong> {{ currentExecution.error }}</p>
-        <p v-if="currentExecution.aborted"><strong>Aborted:</strong> Yes</p>
-      </div>
-      <div v-else>
-        <p>Select a step to view execution details.</p>
-      </div>
+<!--  <div class="container">-->
+<!--    <div class="left-panel">-->
+<!--      <h3>Scenario Steps</h3>-->
+<!--      <div v-for="(scenario, scenarioIndex) in scenarioInfos" :key="scenarioIndex" class="scenario">-->
+<!--        <h3>{{ scenario['scenarioName'] }}</h3>-->
+<!--        <ul>-->
+<!--          <li v-for="(step, stepIndex) in scenario['stepInfos']" :key="stepIndex">-->
+<!--            <strong>{{ step['stepString'] }}</strong>-->
+<!--&lt;!&ndash;            <span> - </span>&ndash;&gt;-->
+<!--&lt;!&ndash;            <span :class="stepStatusClass(scenarioIndex, stepIndex)">&ndash;&gt;-->
+<!--&lt;!&ndash;              {{ getStepStatus(scenarioIndex, stepIndex) }}&ndash;&gt;-->
+<!--&lt;!&ndash;            </span>&ndash;&gt;-->
+<!--          </li>-->
+<!--        </ul>-->
+<!--      </div>-->
+<!--    </div>-->
+  <div>
+    <div v-for="scenario in scenarioInfos" :key="scenarioIndex">
+      <h3>{{scenario.scenarioName}}</h3>
+      <ul>
+        <li v-for="(step, stepIndex) in scenario.stepInfos" :key="stepIndex">
+          <strong>{{ step.stepString }}</strong>
+              <span> - </span>
+              <span :class="stepStatusClass(scenarioIndex, stepIndex)">
+                {{ getStepStatus(scenarioIndex, stepIndex) }}
+              </span>
+        </li>
+    </ul>
     </div>
   </div>
+
+
+<!--    <div class="right-panel">-->
+<!--      <h3>Execution Status</h3>-->
+<!--      <div v-if="currentExecution">-->
+<!--        <p><strong>Status:</strong> {{ currentExecution.status }}</p>-->
+<!--        <p><strong>Duration:</strong> {{ currentExecution.durationNanos }} ns</p>-->
+<!--        <p><strong>Start Time:</strong> {{ formatTime(currentExecution.startTime) }}</p>-->
+<!--        <p><strong>End Time:</strong> {{ formatTime(currentExecution.endTime) }}</p>-->
+<!--        <p v-if="currentExecution.error"><strong>Error:</strong> {{ currentExecution.error }}</p>-->
+<!--        <p v-if="currentExecution.aborted"><strong>Aborted:</strong> Yes</p>-->
+<!--      </div>-->
+<!--      <div v-else>-->
+<!--        <p>Select a step to view execution details.</p>-->
+<!--      </div>-->
+<!--    </div>-->
 
 </template>
 
@@ -124,13 +138,14 @@ export default {
       return;
     }
     const scriptLog = reactive(scriptLogData);
-    const scenarioInfos = reactive(scenarioBaseInfo)
+    const scenarioInfos = reactive([])
     const executeResults = reactive(executeBaseResults)
     return {
       scriptLog,
       scriptBaseInfo,
 
       scenarioInfos,
+      scenarioBaseInfo,
       executeResults,
       currentExecution: null,
     }
@@ -156,8 +171,8 @@ export default {
     webSocket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if(message && message.msgType==="karateFeatureInfos"){
-        console.log(message.content);
-        this.handleKarateFeatureInfos(message.content);
+        console.log(message.content);//json content；
+        this.handleKarateFeatureInfos(JSON.parse(message.content)['scenarioInfos']);
       }else if(message && message.msgType==="executeInfos"){
         console.log(message.content);
         this.handleExecuteInfos(message.content);
@@ -173,20 +188,22 @@ export default {
   },
   methods:{
     handleKarateFeatureInfos(content){
-      this.scenarioInfos = content;
+      for(let i = 0; i<content.length; i++){
+        this.scenarioInfos.push(content[i]);
+      }
     },
     handleExecuteInfos(content) {
-      const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
+      // const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
 
       // 更新该步骤的执行状态
-      this.executeResults[`${scenarioIndex}-${stepIndex}`] = {
-        status,
-        durationNanos,
-        startTime,
-        endTime,
-        error,
-        aborted,
-      }
+      // this.scenarioBaseInfo[`${scenarioIndex}-${stepIndex}`] = {
+      //   status,
+      //   durationNanos,
+      //   startTime,
+      //   endTime,
+      //   error,
+      //   aborted,
+      // }
     },
     getStepStatus(scenarioIndex, stepIndex) {
       const status = this.executeResults[`${scenarioIndex}-${stepIndex}`]?.status;
