@@ -50,14 +50,14 @@
 <!--      </div>-->
 <!--    </div>-->
   <div>
-    <div v-for="scenario in scenarioInfos" :key="scenarioIndex">
+    <div v-for="scenario in scenarioInfos" :key="scenario.index">
       <h3>{{scenario.scenarioName}}</h3>
       <ul>
         <li v-for="(step, stepIndex) in scenario.stepInfos" :key="stepIndex">
           <strong>{{ step.stepString }}</strong>
               <span> - </span>
-              <span :class="stepStatusClass(scenarioIndex, stepIndex)">
-                {{ getStepStatus(scenarioIndex, stepIndex) }}
+              <span>
+                {{ getStepStatus(scenario.index, stepIndex) }}
               </span>
         </li>
     </ul>
@@ -94,9 +94,6 @@ import axios from 'axios';
 // import {initWebSocket, sendMessage, webSocket} from "../js/websocket.js";
 import {reactive} from "vue";
 
-let scriptLogData = [];
-let scenarioBaseInfo = [];
-let executeBaseResults = {};
 let scriptIdFromUrl;
 
 let webSocket;
@@ -137,15 +134,13 @@ export default {
       window.alert("scriptId is null");
       return;
     }
-    const scriptLog = reactive(scriptLogData);
     const scenarioInfos = reactive([])
-    const executeResults = reactive(executeBaseResults)
+    const executeResults = reactive(new Map())
+
     return {
-      scriptLog,
       scriptBaseInfo,
 
       scenarioInfos,
-      scenarioBaseInfo,
       executeResults,
       currentExecution: null,
     }
@@ -171,11 +166,11 @@ export default {
     webSocket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if(message && message.msgType==="karateFeatureInfos"){
-        console.log(message.content);//json content；
+        // console.log(message.content);//json content；
         this.handleKarateFeatureInfos(JSON.parse(message.content)['scenarioInfos']);
       }else if(message && message.msgType==="executeInfos"){
-        console.log(message.content);
-        this.handleExecuteInfos(message.content);
+        // console.log(JSON.parse(message.content));
+        this.handleExecuteInfos(JSON.parse(message.content));
       }
     }
     webSocket.onerror = (error) => {
@@ -188,40 +183,37 @@ export default {
   },
   methods:{
     handleKarateFeatureInfos(content){
-      for(let i = 0; i<content.length; i++){
+      for(let i = 0;i<content.length; i++){
+        console.log(content[i]);
         this.scenarioInfos.push(content[i]);
+        for(let j = 0; j < content[i]['stepInfos'].length; j++){
+          let stepIndexString = i+'-'+content[i]['stepInfos'][j]['index'];
+          this.executeResults.set(stepIndexString, "");
+        }
       }
     },
     handleExecuteInfos(content) {
-      // const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
-
+      const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
       // 更新该步骤的执行状态
-      // this.scenarioBaseInfo[`${scenarioIndex}-${stepIndex}`] = {
-      //   status,
-      //   durationNanos,
-      //   startTime,
-      //   endTime,
-      //   error,
-      //   aborted,
-      // }
+      console.log(content);
+      this.executeResults.set(`${scenarioIndex}-${stepIndex}`, content)
     },
     getStepStatus(scenarioIndex, stepIndex) {
-      const status = this.executeResults[`${scenarioIndex}-${stepIndex}`]?.status;
-      return status || 'Not Started';
+      return this.executeResults.get(`${scenarioIndex}-${stepIndex}`);
     },
-    stepStatusClass(scenarioIndex, stepIndex) {
-      const status = this.executeResults[`${scenarioIndex}-${stepIndex}`]?.status;
-      switch (status) {
-        case 'success':
-          return 'status-success';
-        case 'failure':
-          return 'status-failure';
-        case 'in-progress':
-          return 'status-in-progress';
-        default:
-          return 'status-not-started';
-      }
-    },
+    // stepStatusClass(scenarioIndex, stepIndex) {
+    //   const status = this.executeResults.get(`${scenarioIndex}-${stepIndex}`) === "" ?.status;
+    //   switch (status) {
+    //     case 'success':
+    //       return 'status-success';
+    //     case 'failure':
+    //       return 'status-failure';
+    //     case 'in-progress':
+    //       return 'status-in-progress';
+    //     default:
+    //       return 'status-not-started';
+    //   }
+    // },
     // 设置当前选中的步骤，右侧面板会显示该步骤的执行信息
     selectStep(scenarioIndex, stepIndex) {
       this.currentExecution = this.executeResults[`${scenarioIndex}-${stepIndex}`];
