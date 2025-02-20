@@ -26,39 +26,55 @@
         <label for="version">脚本版本号</label>
         <textarea id="version">{{scriptBaseInfo != null ? scriptBaseInfo['version'] : '无'}}</textarea>
       </div>
+      <div>
+        <label for="version">原始脚本信息</label>
+        <textarea id="version">{{scriptBaseInfo != null ? scriptBaseInfo['scriptData'] : '无'}}</textarea>
+      </div>
     </fieldset>
   </div>
-  <div ref="script_data_info">
-    <table class="table">
-      <thead>
-      <tr>
-        <th>执行脚本内容</th>
-        <th>执行脚本信息</th>
-      </tr>
-      </thead>
-      <tbody>
-      <!-- 根据 dataLines 渲染每一行 -->
-      <tr v-for="(line, index) in scriptBaseInfo.dataLines" :key="index">
-        <td>{{ line }}</td>
-        <td>
-          <div>
-            <div><strong>开始时间:</strong> {{ scriptLog[index]?.startTime || '无' }}</div>
-            <div><strong>结束时间:</strong> {{ scriptLog[index]?.endTime || '无' }}</div>
-            <div><strong>状态:</strong> {{ scriptLog[index]?.status || '未执行' }}</div>
-            <p><strong>执行信息:</strong> {{ scriptLog[index]?.executeInfo || '无' }}</p>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+
+  <div class="container">
+    <div class="left-panel">
+      <h3>Scenario Steps</h3>
+      <div v-for="(scenario, scenarioIndex) in scenarioInfos" :key="scenarioIndex" class="scenario">
+        <h4>{{ scenario.scenarioName }}</h4>
+        <ul>
+          <li v-for="(step, stepIndex) in scenario.stepInfos" :key="stepIndex">
+            <strong>{{ step.stepString }}</strong>
+            <span> - </span>
+            <span :class="stepStatusClass(scenarioIndex, stepIndex)">
+              {{ getStepStatus(scenarioIndex, stepIndex) }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <h3>Execution Status</h3>
+      <div v-if="currentExecution">
+        <p><strong>Status:</strong> {{ currentExecution.status }}</p>
+        <p><strong>Duration:</strong> {{ currentExecution.durationNanos }} ns</p>
+        <p><strong>Start Time:</strong> {{ formatTime(currentExecution.startTime) }}</p>
+        <p><strong>End Time:</strong> {{ formatTime(currentExecution.endTime) }}</p>
+        <p v-if="currentExecution.error"><strong>Error:</strong> {{ currentExecution.error }}</p>
+        <p v-if="currentExecution.aborted"><strong>Aborted:</strong> Yes</p>
+      </div>
+      <div v-else>
+        <p>Select a step to view execution details.</p>
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script>
-//0. 连接socket。应当为一个请求一个socket连接。互不影响。
-//1. 展示基础信息；后端请求返回得到脚本相关信息
-//2. 发起开始执行请求；
-//3. 根据返回的信息动态渲染log信息。
+
+//逻辑上，除去第一次请求完整的Script data之后， socket建立之后：
+//删除了心跳；
+//发起ProcessScriptStart；
+//在FeatureRun回调中，服务端主动推送一次KarateFeatureInfo。携带karate切分的Scenarioid与信息。step的id与信息；
+//在log中，携带此次stepResult的scenarioId和stepid辅助定位。
 
 import axios from 'axios';
 import {initWebSocket, sendMessage, webSocket} from "../js/websocket.js";
@@ -69,7 +85,6 @@ let scriptLog;
 
 let scriptIdFromUrl;
 
-
 export default {
   setup(){
     const scriptBaseInfo = reactive({
@@ -78,7 +93,7 @@ export default {
       scriptName: '',
       scriptDescription: '',
       version: '',
-      dataLines: [],
+      scriptData: '',
     });
 
     scriptIdFromUrl = getScriptId();
@@ -94,15 +109,7 @@ export default {
               scriptBaseInfo.scriptName=temp.scriptName;
               scriptBaseInfo.scriptDescription=temp.scriptDescription;
               scriptBaseInfo.version=temp.version;
-              temp.data.split('\n').map(
-                  line => {
-                    line.trim()
-                    if(line.length > 0){
-                      scriptBaseInfo.dataLines.push(line);
-                    }
-                  }
-              );
-              console.log(scriptBaseInfo)
+              scriptBaseInfo.scriptData=temp.data;
             }
         )
         console.log(scriptBaseInfo)
@@ -114,33 +121,121 @@ export default {
       window.alert("scriptId is null");
       return;
     }
-    //初始化websocket连接。
-    try {
-      initWebSocket("ws://127.0.0.1:8080/websocket", onWebsocketMessageRecvCallback);
-    }catch(e){
-      window.alert("websocket connect failed");
-      return;
-    }
     scriptLog = reactive(scriptLogData);
     return {
       scriptLog,
       scriptBaseInfo,
+
+      scenarioInfos: [],
+      executeResults: {},
+      webSocket : null,
+      currentExecution: null,
     }
   },
   mounted() {
-    //基于websocket提示对端开始执行脚本
-    webSocket.addEventListener('open', function () {
+    // if ("WebSocket" in window) {
+    //   this.webSocket = new WebSocket("ws://127.0.0.1:8080/websocket");//创建socket对象
+    // } else {
+    //   console.log(JSON.stringify({message: '该浏览器不支持websocket!', type: 'warning'}));
+    //   throw new Error("websocket unsupported");
+    // }
+    // //基于websocket提示对端开始执行脚本
+    // this.webSocket.onopen = function(){
+    //   console.log('WebSocket connection opened')
+    //   let startFeatureRequest = {
+    //     msgType:"SCRIPTSTART",
+    //     content:{
+    //       "scriptId": scriptIdFromUrl.value,
+    //     }
+    //   };
+    //   this.webSocket.send(JSON.stringify(startFeatureRequest));
+    // };
+    // this.webSocket.onmessage = (event) => {
+    //   const message = JSON.parse(event.data);
+    //   if(message && message.msgType==="karateFeatureInfos"){
+    //     this.handleKarateFeatureInfos(message.content);
+    //   }else if(message && message.msgType==="executeInfos"){
+    //     this.handleExecuteInfos(message.content);
+    //   }
+    // }
+    // this.webSocket.onerror = (error) => {
+    //   console.error('WebSocket error: ', error);
+    // };
+    // this.webSocket.onclose = () => {
+    //   console.log('WebSocket connection closed');
+    // };
+    // window.onunload(()=>{
+    //   this.webSocket.close();
+    // })
+    try {
       let startFeatureRequest = {
-        msgType:"process",
-        contentType:"script_start",
-        content:{
-          "scriptId": scriptIdFromUrl.value,
+        msgType: "script_start",
+        content: {
+          "scriptId": scriptIdFromUrl,
         }
-      };
-      sendMessage(startFeatureRequest);
-    });
+      }
+      initWebSocket("ws://127.0.0.1:8080/websocket", function(message){
+        console.log("socket recv message result", message)
+        if(message && message.msgType==="karateFeatureInfos"){
+          this.handleKarateFeatureInfos(message.content);
+        }else if(message && message.msgType==="executeInfos"){
+          this.handleExecuteInfos(message.content);
+        }
+      }, startFeatureRequest);
+    }catch(e){
+      window.alert("websocket connect failed");
+      return;
+    }
+
   },
+  methods:{
+    handleKarateFeatureInfos(content){
+      this.scenarioInfos = content;
+    },
+    handleExecuteInfos(content) {
+      const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
+
+      // 更新该步骤的执行状态
+      this.$set(this.executeResults, `${scenarioIndex}-${stepIndex}`, {
+        status,
+        durationNanos,
+        startTime,
+        endTime,
+        error,
+        aborted,
+      });
+    },
+    getStepStatus(scenarioIndex, stepIndex) {
+      const status = this.executeResults[`${scenarioIndex}-${stepIndex}`]?.status;
+      return status || 'Not Started';
+    },
+    stepStatusClass(scenarioIndex, stepIndex) {
+      const status = this.executeResults[`${scenarioIndex}-${stepIndex}`]?.status;
+      switch (status) {
+        case 'success':
+          return 'status-success';
+        case 'failure':
+          return 'status-failure';
+        case 'in-progress':
+          return 'status-in-progress';
+        default:
+          return 'status-not-started';
+      }
+    },
+    // 设置当前选中的步骤，右侧面板会显示该步骤的执行信息
+    selectStep(scenarioIndex, stepIndex) {
+      this.currentExecution = this.executeResults[`${scenarioIndex}-${stepIndex}`];
+    },
+    // 格式化时间戳
+    formatTime(timestamp) {
+      if (!timestamp) return 'N/A';
+      const date = new Date(timestamp);
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    },
+  }
+
 }
+
 
 function getScriptId(){
   const path = window.location.href;
@@ -161,21 +256,6 @@ async function fetchScriptBaseInfo(){
       r =>{ res = r }
   );
   return res.data;
-}
-
-function onWebsocketMessageRecvCallback(jsonMessage){
-  let msgType = jsonMessage['msgType'];
-  let jsonObject = JSON.parse(jsonMessage["content"]);
-
-  if(msgType === 'executeInfos') {
-    scriptLog[jsonObject["featureId"]].scenarios[jsonObject["scenarioId"]].steps[jsonObject["stepId"]].executeInfo = jsonObject["errorMsg"];
-    scriptLogData[jsonObject["featureId"]].scenarios[jsonObject["scenarioId"]].steps[jsonObject["stepId"]].status = jsonObject["status"];
-    scriptLogData[jsonObject["featureId"]].scenarios[jsonObject["scenarioId"]].steps[jsonObject["stepId"]].startTime = jsonObject["startTime"];
-    scriptLogData[jsonObject["featureId"]].scenarios[jsonObject["scenarioId"]].steps[jsonObject["stepId"]].endTime = jsonObject["endTime"];
-  }
-  else {
-    console.log("other type hasn't complete yet");
-  }
 }
 
 </script>

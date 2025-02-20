@@ -31,7 +31,7 @@ let heartCheck = { //目前仅支持单设备。之后再标记当前浏览器�
     }
 }
 
-export function initWebSocket(websocketUrl, callback){
+export function initWebSocket(websocketUrl, callback, onOpenMsg){
     //定义的接收socket数据的函数
     if(callback){
         if(typeof callback == 'function'){
@@ -54,9 +54,11 @@ export function initWebSocket(websocketUrl, callback){
         isConnect = true;
         heartCheck.start();
         reConnectNum = 0;
+        sendMessage(onOpenMsg);
     };
     //收信
     webSocket.onmessage = function(e) {
+        console.log(e);
         console.log("websocket信息:");
         console.log(e.data);
         const data = JSON.parse(e.data);//根据自己的需要对接收到的数据进行格式化
