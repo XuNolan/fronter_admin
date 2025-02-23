@@ -483,6 +483,14 @@
                               ]
                             }
                           }
+                        },
+                        {
+                          "type": "button",
+                          "label": "删除",
+                          "level": "danger",
+                          "actionType": "ajax",
+                          "confirmText": "您确认要删除此脚本?",
+                          "api": "delete:http://localhost:8080/script/delete?scriptId=${scriptId}"
                         }
                       ],
                       "id": "u:0b50227ae35b"
