@@ -495,10 +495,12 @@
                           "ignoreError": false,
                           "actionType": "ajax",
                           "outputVar": "responseResult",
-                          "options": {},
-                          "api": {
-                            "url": "http://127.0.0.1:8080/script/active?usecaseId=${id}&scriptId=${scriptId}",
-                            "method": "post"
+                          "args": {
+                            "options": {},
+                            "api": {
+                              "url": "http://127.0.0.1:8080/script/active?usecaseId=${id}&scriptId=${scriptId}",
+                              "method": "get"
+                            }
                           }
                         },
                         {
@@ -543,10 +545,12 @@
                           "ignoreError": false,
                           "actionType": "ajax",
                           "outputVar": "responseResult",
-                          "options": {},
-                          "api": {
-                            "url": "http://127.0.0.1:8080/script/deActive?scriptId=${scriptId}",
-                            "method": "post"
+                          "args": {
+                            "options": {},
+                            "api": {
+                              "url": "http://127.0.0.1:8080/script/deActive?scriptId=${scriptId}",
+                              "method": "get"
+                            }
                           }
                         },
                         {
