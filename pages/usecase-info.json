@@ -140,7 +140,14 @@
                                 ],
                                 "api": {
                                   "url": "http://127.0.0.1:8080/script/new?usecaseId=${id}",
-                                  "method": "post"
+                                  "method": "post",
+                                  "data": {
+                                    "usecaseId": "${id}",
+                                    "name": "${newScriptName}",
+                                    "version": "${newScriptVersion}",
+                                    "description": "${newScriptDescription}",
+                                    "data": "${newScriptData}"
+                                  }
                                 },
                                 "actions": [
                                   {
