@@ -231,7 +231,159 @@
                   "label": "编辑",
                   "onEvent": {
                     "click": {
-                      "actions": []
+                      "actions": [
+                        {
+                          "ignoreError": false,
+                          "actionType": "dialog",
+                          "dialog": {
+                            "type": "dialog",
+                            "title": "修改用例",
+                            "body": [
+                              {
+                                "type": "form",
+                                "id": "u:446a722254b7",
+                                "mode": "flex",
+                                "labelAlign": "top",
+                                "title": "表单",
+                                "dsType": "api",
+                                "feat": "Insert",
+                                "body": [
+                                  {
+                                    "type": "input-text",
+                                    "label": "用例名",
+                                    "name": "modifiedUsecaseName",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "id": "u:ac0b71081448",
+                                    "value": "${usecaseName}"
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "用例描述",
+                                    "name": "modifiedUsecaseDescription",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${usecaseDescription}",
+                                    "id": "u:8f1fb8a8d7bc"
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "创建时间",
+                                    "name": "created",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${created}",
+                                    "id": "u:8f1fb8a8d7bc",
+                                    "readOnly": true
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "修改时间",
+                                    "name": "updated",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${updated}",
+                                    "id": "u:8f1fb8a8d7bc",
+                                    "readOnly": true
+                                  }
+                                ],
+                                "api": {
+                                  "url": "http://127.0.0.1:8080/usecase/update/${id}",
+                                  "method": "post",
+                                  "data": {
+                                    "name": "${modifiedUsecaseName}",
+                                    "description": "${modifiedUsecaseDescription}"
+                                  }
+                                },
+                                "actions": [
+                                  {
+                                    "type": "button",
+                                    "label": "取消",
+                                    "onEvent": {
+                                      "click": {
+                                        "actions": [
+                                          {
+                                            "ignoreError": false,
+                                            "actionType": "closeDialog"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "level": "primary"
+                                  },
+                                  {
+                                    "type": "button",
+                                    "label": "提交",
+                                    "onEvent": {
+                                      "click": {
+                                        "actions": [
+                                          {
+                                            "actionType": "submit"
+                                          },
+                                          {
+                                            "ignoreError": false,
+                                            "actionType": "closeDialog"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "level": "primary"
+                                  }
+                                ],
+                                "resetAfterSubmit": true,
+                                "preventEnterSubmit": true,
+                                "debug": false,
+                                "initApi": {
+                                  "url": "http://127.0.0.1:8080/usecase/query/${id}",
+                                  "method": "get",
+                                  "responseData": {
+                                    "usecaseName": "${name}",
+                                    "usecaseDescription": "${description}"
+                                  }
+                                }
+                              }
+                            ],
+                            "id": "u:e544982789cb",
+                            "actions": [
+                              {
+                                "type": "button",
+                                "actionType": "cancel",
+                                "label": "取消",
+                                "id": "u:87cc235df9a2",
+                                "onEvent": {
+                                  "click": {
+                                    "weight": 0,
+                                    "actions": [
+                                      {
+                                        "ignoreError": false,
+                                        "actionType": "closeDialog"
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "type": "button",
+                                "actionType": "confirm",
+                                "label": "确定",
+                                "primary": true,
+                                "id": "u:7a56deb3ee2b"
+                              }
+                            ],
+                            "asideResizor": false,
+                            "pullRefresh": {
+                              "disabled": true
+                            },
+                            "showCloseButton": true,
+                            "closeOnOutside": false,
+                            "closeOnEsc": false,
+                            "showErrorMsg": true,
+                            "showLoading": true,
+                            "draggable": false,
+                            "actionType": "dialog"
+                          }
+                        }
+                      ]
                     }
                   },
                   "id": "u:9bc376403723",
