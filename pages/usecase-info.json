@@ -268,7 +268,7 @@
               "syncLocation": false,
               "api": {
                 "method": "get",
-                "url": "http://127.0.0.1:8080/script/list?usecaseId=${id}"
+                "url": "http://127.0.0.1:8080/script/list?usecaseId=${id}&keyword=${keyword}"
               },
               "bulkActions": [],
               "itemActions": [],
@@ -357,7 +357,7 @@
                 "body": [
                   {
                     "type": "input-text",
-                    "name": "usecase_name",
+                    "name": "keyword",
                     "label": "脚本名",
                     "id": "u:cb1faa247032"
                   },
