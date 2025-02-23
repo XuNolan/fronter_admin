@@ -589,10 +589,185 @@
                   "label": "编辑",
                   "onEvent": {
                     "click": {
-                      "actions": []
+                      "actions": [
+                        {
+                          "ignoreError": false,
+                          "actionType": "dialog",
+                          "dialog": {
+                            "type": "dialog",
+                            "title": "修改脚本",
+                            "body": [
+                              {
+                                "type": "form",
+                                "id": "u:446a722254b7",
+                                "mode": "flex",
+                                "labelAlign": "top",
+                                "title": "表单",
+                                "dsType": "api",
+                                "feat": "Insert",
+                                "body": [
+                                  {
+                                    "type": "input-text",
+                                    "label": "脚本名",
+                                    "name": "modifiedScriptName",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${scriptName}",
+                                    "id": "u:74ab64f79815"
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "脚本版本",
+                                    "name": "modifiedScriptVersion",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${scriptVersion}",
+                                    "id": "u:ac0b71081448"
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "脚本描述",
+                                    "name": "modifiedScriptDescription",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${scriptDescription}",
+                                    "id": "u:11bd7f668c2d"
+                                  },
+                                  {
+                                    "type": "editor",
+                                    "label": "脚本代码内容",
+                                    "name": "modifiedScriptData",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${scriptData}",
+                                    "id": "u:b890c8fc3e10"
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "创建时间",
+                                    "name": "created",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${scriptCreated}",
+                                    "readOnly": true,
+                                    "id": "u:08065f1f1064"
+                                  },
+                                  {
+                                    "type": "input-text",
+                                    "label": "修改时间",
+                                    "name": "updated",
+                                    "mode": "horizontal",
+                                    "labelAlign": "left",
+                                    "value": "${scriptUpdated}",
+                                    "readOnly": true,
+                                    "id": "u:eb50e3fbfaea"
+                                  }
+                                ],
+                                "api": {
+                                  "url": "http://127.0.0.1:8080/script/update/${scriptId}",
+                                  "method": "post",
+                                  "data": {
+                                    "name": "${modifiedScriptName}",
+                                    "version": "${modifiedScriptVersion}",
+                                    "description": "${modifiedScriptDescription}",
+                                    "data": "${modifiedScriptData}"
+                                  }
+                                },
+                                "actions": [
+                                  {
+                                    "type": "button",
+                                    "label": "取消",
+                                    "onEvent": {
+                                      "click": {
+                                        "actions": [
+                                          {
+                                            "ignoreError": false,
+                                            "actionType": "closeDialog"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "level": "primary"
+                                  },
+                                  {
+                                    "type": "button",
+                                    "label": "提交",
+                                    "onEvent": {
+                                      "click": {
+                                        "actions": [
+                                          {
+                                            "actionType": "submit"
+                                          },
+                                          {
+                                            "ignoreError": false,
+                                            "actionType": "closeDialog"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "level": "primary"
+                                  }
+                                ],
+                                "resetAfterSubmit": true,
+                                "preventEnterSubmit": true,
+                                "debug": false,
+                                "initApi": {
+                                  "url": "http://127.0.0.1:8080/script/query/${scriptId}",
+                                  "method": "get",
+                                  "responseData": {
+                                    "scriptName": "${name}",
+                                    "scriptVersion": "${version}",
+                                    "scriptDescription": "${description}",
+                                    "scriptData": "${data}",
+                                    "scriptUpdated": "${updated}",
+                                    "scriptCreated": "${created}"
+                                  }
+                                }
+                              }
+                            ],
+                            "id": "u:e544982789cb",
+                            "actions": [
+                              {
+                                "type": "button",
+                                "actionType": "cancel",
+                                "label": "取消",
+                                "id": "u:87cc235df9a2",
+                                "onEvent": {
+                                  "click": {
+                                    "weight": 0,
+                                    "actions": [
+                                      {
+                                        "ignoreError": false,
+                                        "actionType": "closeDialog"
+                                      }
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "type": "button",
+                                "actionType": "confirm",
+                                "label": "确定",
+                                "primary": true,
+                                "id": "u:7a56deb3ee2b"
+                              }
+                            ],
+                            "showCloseButton": true,
+                            "closeOnOutside": false,
+                            "closeOnEsc": false,
+                            "showErrorMsg": true,
+                            "showLoading": true,
+                            "draggable": false,
+                            "asideResizor": false,
+                            "pullRefresh": {
+                              "disabled": true
+                            },
+                            "actionType": "dialog"
+                          }
+                        }
+                      ]
                     }
                   },
-                  "id": "u:240827afc81f",
                   "level": "primary",
                   "themeCss": {
                     "className": {
@@ -607,7 +782,8 @@
                         "marginLeft": "var(--sizes-size-6)"
                       }
                     }
-                  }
+                  },
+                  "id": "u:8d1296c9bc2d"
                 },
                 {
                   "type": "button",
