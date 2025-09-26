@@ -16,10 +16,9 @@ export default {
           "redirect": "/usecase/list"
         },
         {
-          "label": "用例管理",
           "children": [
             {
-              "label": "用例管理",
+              "label": "前端自动化测试",
               "url": "/usecase",
               "rewrite": "/usecase/",
               "icon": "fa fa-cube",
@@ -43,6 +42,42 @@ export default {
                 }
               ]
             }
+          ]
+        },
+        {
+          "children": [
+            {
+              "label": "压力测试",
+              "url": "/pressure",
+              "icon": "fa fa-tasks",
+              "children": [
+                {
+                  "label": "新建压测任务",
+                  "url": "/pressure/new",
+                  "schema": {
+                    "type": "page",
+                    "body": {
+                      "type": "iframe",
+                      "src": "/pages/config_pressure.html",
+                      "height": "100vh"
+                    }
+                  }
+                },
+                {
+                  "label": "任务历史报告",
+                  "url": "/pressure/history",
+                  "icon": "fa fa-tasks",
+                  "schemaApi": "get:/pages/test2.json"
+                },
+                {
+                    "label": "压测任务详情",
+                    "url": "/pressure/query/:id",
+                    "icon": "fa fa-info-circle",
+                    "schemaApi": "get:/pages/pressure-info.json"
+                }
+              ]
+            }
+            
           ]
         }
       ]

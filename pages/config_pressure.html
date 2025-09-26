@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZAgent 配置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .column-compact {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .column-strategy {
+            flex: 2;
+        }
+
+        .column-wide {
+            flex: 2;
+        }
+
+        .column-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .strategy-config {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        .poisson-row, .flow-row, .ovsdb-row {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .poisson-row .form-row, .flow-row .form-row, .ovsdb-row .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .poisson-row .form-item, .flow-row .form-item, .ovsdb-row .form-item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .poisson-row .form-item:last-child, .flow-row .form-item:last-child, .ovsdb-row .form-item:last-child {
+            flex: 0 0 auto;
+            width: 80px;
+        }
+
+        .poisson-row .form-input, .flow-row .form-input, .ovsdb-row .form-input {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 0.9rem;
+        }
+
+        .poisson-row .form-label, .flow-row .form-label, .ovsdb-row .form-label {
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .ovsdb-row-data {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .ovsdb-column-input {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ovsdb-column-input .form-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .ovsdb-column-input .form-input {
+            font-size: 0.85rem;
+            padding: 4px 6px;
+        }
+
+        .boolean-input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .boolean-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .boolean-radio {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .boolean-label {
+            font-size: 0.85rem;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .boolean-label:hover {
+            color: #333;
+        }
+
+        .flow-rule-input {
+            width: 100%;
+            min-width: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            width: 100%;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .table-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .table-card.selected {
+            border-color: #007bff;
+            background: #f8f9ff;
+        }
+
+        .table-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .column-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            font-size: 0.8rem;
+        }
+
+        .column-checkbox {
+            margin-right: 6px;
+        }
+
+        .column-name {
+            color: #666;
+            flex: 1;
+        }
+
+        .column-type {
+            background: #f0f0f0;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .action-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+
+        .column-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+        }
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .column-item:last-child {
+            border-bottom: none;
+        }
+
+        .column-checkbox {
+            margin-right: 10px;
+        }
+
+        .column-name {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .column-type {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .modal-icon.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .modal-icon.error {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .modal-icon.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 20px;
+            text-align: right;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .modal-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .modal-btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 第一行：设备配置和压力策略 -->
+    <div class="row">
+        <div class="column column-compact">
+            <div class="column-title">设备配置</div>
+
+            <div class="form-group">
+                <label class="form-label">SN</label>
+                <input type="text" class="form-input" id="device_sn" value="092450775319979">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">fwVersion</label>
+                <input type="text" class="form-input" id="fw_version" value="V6F4.AA1.02">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">hwVersion</label>
+                <input type="text" class="form-input" id="hw_version" value="FX71m_V1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">model</label>
+                <input type="text" class="form-input" id="device_model" value="FX71m">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">vendor</label>
+                <input type="text" class="form-input" id="vendor" value="FXZS">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">kitVersion</label>
+                <input type="text" class="form-input" id="kit_version" value="2.1.1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">HTTP IP</label>
+                <input type="text" class="form-input" id="http_ip" value="127.0.0.1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">HTTP Port</label>
+                <input type="number" class="form-input" id="http_port" value="8888">
+            </div>
+        </div>
+
+        <div class="column column-strategy">
+            <div class="column-title">压力策略</div>
+
+            <div class="form-group">
+                <label class="form-label">策略类型</label>
+                <select class="form-input" id="strategy_type" onchange="showStrategyConfig()">
+                    <option value="">请选择策略</option>
+                    <option value="uniform">均匀流量</option>
+                    <option value="poisson">泊松分布</option>
+                    <option value="burst">爆发分布</option>
+                </select>
+            </div>
+
+            <!-- 均匀流量配置 -->
+            <div id="uniform_config" class="strategy-config hidden">
+                <div class="form-group">
+                    <label class="form-label">设备数量</label>
+                    <input type="number" class="form-input" id="uniform_device_count" value="100" min="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">平均 QPS</label>
+                    <input type="number" class="form-input" id="uniform_qps" value="1000" min="1">
+                </div>
+            </div>
+
+            <!-- 泊松分布配置 -->
+            <div id="poisson_config" class="strategy-config hidden">
+                <div class="form-group">
+                    <label class="form-label">QPS 配置</label>
+                    <div id="poisson_config_rows">
+                        <div class="poisson-row">
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label">持续时间(秒)</label>
+                                    <input type="number" class="form-input poisson-duration" value="3600" min="1">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label">QPS</label>
+                                    <input type="number" class="form-input poisson-qps" value="500" min="1">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label">操作</label>
+                                    <button type="button" class="btn btn-remove" onclick="removePoissonRow(this)">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-add" onclick="addPoissonRow()">+ 添加配置行</button>
+                </div>
+            </div>
+
+            <!-- 爆发分布配置 -->
+            <div id="burst_config" class="strategy-config hidden">
+                <div class="form-group">
+                    <label class="form-label">设备数量</label>
+                    <input type="number" class="form-input" id="burst_device_count" value="50" min="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">持续时间(秒)</label>
+                    <input type="number" class="form-input" id="burst_duration" value="60" min="1">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二行：OpenFlow流表配置 -->
+    <div class="row">
+        <div class="column column-wide">
+            <div class="column-title">OpenFlow流表配置</div>
+
+            <div class="form-group">
+                <label class="form-label">流表类型</label>
+                <select class="form-input" id="flow_table_type" onchange="showFlowTableConfig()">
+                    <option value="">请选择流表类型</option>
+                    <option value="string">字符串流表</option>
+                    <option value="binary">二进制流表</option>
+                </select>
+            </div>
+
+            <!-- 字符串流表配置 -->
+            <div id="string_flow_config" class="strategy-config hidden">
+                <div class="form-group">
+                    <label class="form-label">字符串流表 (OVS格式)</label>
+                    <div id="string_flow_rows">
+                        <div class="flow-row">
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label">流表规则</label>
+                                    <input type="text" class="form-input flow-rule-input string-flow-rule" value="table=0,priority=100,in_port=1,actions=output:2" placeholder="table=0,priority=100,in_port=1,actions=output:2">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label">操作</label>
+                                    <button type="button" class="btn btn-remove" onclick="removeFlowRow(this)">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-add" onclick="addFlowRow('string')">+ 添加流表规则</button>
+                </div>
+            </div>
+
+            <!-- 二进制流表配置 -->
+            <div id="binary_flow_config" class="strategy-config hidden">
+                <div class="form-group">
+                    <label class="form-label">二进制流表 (十六进制)</label>
+                    <div id="binary_flow_rows">
+                        <div class="flow-row">
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label">流表规则</label>
+                                    <input type="text" class="form-input flow-rule-input binary-flow-rule" value="0100000c 00000000 00000001 00000002" placeholder="0100000c 00000000 00000001 00000002">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label">操作</label>
+                                    <button type="button" class="btn btn-remove" onclick="removeFlowRow(this)">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-add" onclick="addFlowRow('binary')">+ 添加流表规则</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第三行：OVSDB表列配置 -->
+    <div class="row">
+        <div class="column">
+            <div class="column-title">OVSDB数据配置</div>
+
+            <div class="form-group">
+                <div id="ovsdb_data_rows">
+                    <!-- 动态生成配置单元 -->
+                </div>
+                <button type="button" class="btn btn-add" onclick="addOVSDBRow()">+ 添加配置单元</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 操作按钮 -->
+<div class="action-buttons">
+    <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+    <button class="btn btn-secondary" onclick="compileProject()">编译</button>
+    <button class="btn btn-success" onclick="runTest()">运行</button>
+</div>
+
+<!-- 状态消息 -->
+<div id="status-message" class="hidden"></div>
+
+<!-- 弹窗 -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div id="modal-icon" class="modal-icon"></div>
+            <h3 id="modal-title" class="modal-title"></h3>
+        </div>
+        <div class="modal-body">
+            <p id="modal-message"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="modal-btn" class="modal-btn modal-btn-primary" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // OVSDB Schema 数据 - 动态加载
+    let ovsdbSchema = {};
+    let selectedColumns = [];
+    let currentTable = null;
+
+    // 解析列类型 - 模仿schema.c的逻辑
+    function parseColumnType(columnDef) {
+        if (typeof columnDef.type === 'string') {
+            // 简单类型：string, integer, boolean, real, uuid
+            return columnDef.type;
+        } else if (columnDef.type && typeof columnDef.type === 'object') {
+            const typeObj = columnDef.type;
+            const max = typeObj.max === 'unlimited' ? Number.MAX_SAFE_INTEGER : (typeObj.max || 1);
+            const min = typeObj.min || 1;
+
+            // 获取key和value类型
+            const keyType = getAtomicType(typeObj.key);
+            const valueType = typeObj.value ? getAtomicType(typeObj.value) : null;
+
+            if (max === 1 && min === 1) {
+                // 标量类型
+                return keyType;
+            } else if (valueType === null) {
+                // set类型
+                return `set<${keyType}>`;
+            } else {
+                // map类型
+                return `map<${keyType}, ${valueType}>`;
+            }
+        }
+        return 'unknown';
+    }
+
+    // 获取原子类型
+    function getAtomicType(typeDef) {
+        if (typeof typeDef === 'string') {
+            return typeDef;
+        } else if (typeDef && typeof typeDef === 'object') {
+            if (typeDef.type) {
+                return typeDef.type;
+            }
+        }
+        return 'unknown';
+    }
+
+    // 加载OVSDB Schema
+    async function loadOVSDBSchema() {
+        try {
+            const response = await fetch('/ovsdb-schema.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const schemaData = await response.json();
+
+            // 解析tables下的所有表
+            if (schemaData.tables) {
+                ovsdbSchema = {};
+                Object.keys(schemaData.tables).forEach(tableName => {
+                    const table = schemaData.tables[tableName];
+                    if (table.columns) {
+                        ovsdbSchema[tableName] = {
+                            columns: {}
+                        };
+
+                        // 解析每个列的类型
+                        Object.keys(table.columns).forEach(columnName => {
+                            const columnDef = table.columns[columnName];
+                            const columnType = parseColumnType(columnDef);
+                            ovsdbSchema[tableName].columns[columnName] = {
+                                type: columnType
+                            };
+                        });
+                    }
+                });
+            }
+
+            console.log('OVSDB Schema loaded successfully:', ovsdbSchema);
+            return true;
+        } catch (error) {
+            console.error('Failed to load OVSDB Schema:', error);
+            // 如果加载失败，使用空schema
+            ovsdbSchema = {};
+            return false;
+        }
+    }
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', async function() {
+        // 先加载OVSDB Schema
+        const schemaLoaded = await loadOVSDBSchema();
+        if (schemaLoaded) {
+            console.log('使用动态加载的OVSDB Schema');
+        } else {
+            console.log('OVSDB Schema load failed');
+        }
+        // 初始化OVSDB配置区域
+        initializeOVSDBConfig();
+    });
+
+
+    // 初始化OVSDB配置区域
+    function initializeOVSDBConfig() {
+        // 清空数据行容器
+        const dataRowsContainer = document.getElementById('ovsdb_data_rows');
+        dataRowsContainer.innerHTML = '';
+
+        // 不自动添加配置单元，让用户手动添加
+        // OVSDB配置为可选
+    }
+
+    // 获取列类型的显示文本
+    function getColumnTypeDisplay(columnDef) {
+        if (typeof columnDef.type === 'string') {
+            return columnDef.type;
+        } else if (columnDef.type && typeof columnDef.type === 'object') {
+            if (columnDef.type.key && columnDef.type.value) {
+                return `map<${columnDef.type.key}, ${columnDef.type.value}>`;
+            } else if (columnDef.type.key) {
+                return `set<${columnDef.type.key}>`;
+            } else {
+                return 'object';
+            }
+        }
+        return 'unknown';
+    }
+
+    // 添加OVSDB配置单元
+    function addOVSDBRow() {
+        const container = document.getElementById('ovsdb_data_rows');
+        const newRow = document.createElement('div');
+        newRow.className = 'ovsdb-row';
+
+        // 创建表选择器
+        const tableSelectDiv = document.createElement('div');
+        tableSelectDiv.className = 'form-group';
+        tableSelectDiv.innerHTML = `
+                <label class="form-label">选择表</label>
+                <select class="form-input ovsdb-table-select" onchange="updateRowColumns(this)">
+                    <option value="">请选择表</option>
+                </select>
+            `;
+
+        // 添加表选项
+        const tableSelect = tableSelectDiv.querySelector('.ovsdb-table-select');
+        Object.keys(ovsdbSchema).forEach(tableName => {
+            const option = document.createElement('option');
+            option.value = tableName;
+            option.textContent = tableName;
+            tableSelect.appendChild(option);
+        });
+
+        // 创建列选择区域
+        const columnsDiv = document.createElement('div');
+        columnsDiv.className = 'form-group';
+        columnsDiv.innerHTML = `
+                <label class="form-label">选择列</label>
+                <div class="ovsdb-row-columns column-list">
+                    <!-- 动态生成列选择 -->
+                </div>
+            `;
+
+        // 创建数据输入区域
+        const dataDiv = document.createElement('div');
+        dataDiv.className = 'form-group';
+        dataDiv.innerHTML = `
+                <label class="form-label">行数据</label>
+                <div class="ovsdb-row-data">
+                    <!-- 动态生成列输入框 -->
+                </div>
+            `;
+
+        // 创建操作按钮
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'form-group';
+        actionDiv.innerHTML = `
+                <button type="button" class="btn btn-remove" onclick="removeOVSDBRow(this)">删除此配置单元</button>
+            `;
+
+        newRow.appendChild(tableSelectDiv);
+        newRow.appendChild(columnsDiv);
+        newRow.appendChild(dataDiv);
+        newRow.appendChild(actionDiv);
+
+        container.appendChild(newRow);
+    }
+
+    // 更新行的列选择
+    function updateRowColumns(tableSelect) {
+        const selectedTable = tableSelect.value;
+        const row = tableSelect.closest('.ovsdb-row');
+        const columnsContainer = row.querySelector('.ovsdb-row-columns');
+        const dataContainer = row.querySelector('.ovsdb-row-data');
+
+        // 清空列选择和数据输入
+        columnsContainer.innerHTML = '';
+        dataContainer.innerHTML = '';
+
+        if (!selectedTable) return;
+
+        // 生成列选择
+        Object.keys(ovsdbSchema[selectedTable].columns).forEach(columnName => {
+            const columnItem = document.createElement('div');
+            columnItem.className = 'column-item';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'column-checkbox';
+            checkbox.id = `${selectedTable}_${columnName}_${Date.now()}`;
+            checkbox.dataset.table = selectedTable;
+            checkbox.dataset.column = columnName;
+            checkbox.addEventListener('change', () => updateRowData(row));
+
+            const columnNameSpan = document.createElement('span');
+            columnNameSpan.className = 'column-name';
+            columnNameSpan.textContent = columnName;
+
+            const columnTypeSpan = document.createElement('span');
+            columnTypeSpan.className = 'column-type';
+            columnTypeSpan.textContent = getColumnTypeDisplay(ovsdbSchema[selectedTable].columns[columnName]);
+
+            columnItem.appendChild(checkbox);
+            columnItem.appendChild(columnNameSpan);
+            columnItem.appendChild(columnTypeSpan);
+            columnsContainer.appendChild(columnItem);
+        });
+    }
+
+    // 更新行的数据输入
+    function updateRowData(row) {
+        const selectedTable = row.querySelector('.ovsdb-table-select').value;
+        const dataContainer = row.querySelector('.ovsdb-row-data');
+        const checkboxes = row.querySelectorAll('.column-checkbox:checked');
+
+        // 清空数据输入
+        dataContainer.innerHTML = '';
+
+        if (!selectedTable) return;
+
+        // 为每个选中的列创建输入框
+        checkboxes.forEach(checkbox => {
+            const columnName = checkbox.dataset.column;
+            const columnType = ovsdbSchema[selectedTable].columns[columnName].type;
+
+            const columnInput = document.createElement('div');
+            columnInput.className = 'ovsdb-column-input';
+
+            const label = document.createElement('label');
+            label.className = 'form-label';
+            label.textContent = `${columnName} (${columnType})`;
+
+            let input;
+            if (columnType === 'boolean') {
+                // 创建布尔值选择容器
+                input = document.createElement('div');
+                input.className = 'boolean-input-container';
+                input.dataset.column = columnName;
+                input.dataset.type = columnType;
+
+                // 创建True选项
+                const trueContainer = document.createElement('div');
+                trueContainer.className = 'boolean-option';
+
+                const trueCheckbox = document.createElement('input');
+                trueCheckbox.type = 'radio';
+                trueCheckbox.name = `${columnName}_boolean`;
+                trueCheckbox.value = 'true';
+                trueCheckbox.id = `${columnName}_true`;
+                trueCheckbox.className = 'boolean-radio';
+
+                const trueLabel = document.createElement('label');
+                trueLabel.htmlFor = `${columnName}_true`;
+                trueLabel.textContent = 'True';
+                trueLabel.className = 'boolean-label';
+
+                trueContainer.appendChild(trueCheckbox);
+                trueContainer.appendChild(trueLabel);
+
+                // 创建False选项
+                const falseContainer = document.createElement('div');
+                falseContainer.className = 'boolean-option';
+
+                const falseCheckbox = document.createElement('input');
+                falseCheckbox.type = 'radio';
+                falseCheckbox.name = `${columnName}_boolean`;
+                falseCheckbox.value = 'false';
+                falseCheckbox.id = `${columnName}_false`;
+                falseCheckbox.className = 'boolean-radio';
+
+                const falseLabel = document.createElement('label');
+                falseLabel.htmlFor = `${columnName}_false`;
+                falseLabel.textContent = 'False';
+                falseLabel.className = 'boolean-label';
+
+                falseContainer.appendChild(falseCheckbox);
+                falseContainer.appendChild(falseLabel);
+
+                // 添加到容器
+                input.appendChild(trueContainer);
+                input.appendChild(falseContainer);
+            } else {
+                // 创建普通输入框
+                input = document.createElement('input');
+                input.type = getInputType(columnType);
+                input.className = 'form-input';
+                input.placeholder = getPlaceholder(columnType);
+                input.dataset.column = columnName;
+                input.dataset.type = columnType;
+            }
+
+            columnInput.appendChild(label);
+            columnInput.appendChild(input);
+            dataContainer.appendChild(columnInput);
+        });
+    }
+
+    // 删除OVSDB数据行
+    function removeOVSDBRow(button) {
+        const container = document.getElementById('ovsdb_data_rows');
+        const rows = container.querySelectorAll('.ovsdb-row');
+
+        // 允许删除所有配置单元，OVSDB配置为可选
+        button.closest('.ovsdb-row').remove();
+    }
+
+    // 根据列类型获取输入框类型
+    function getInputType(columnType) {
+        if (columnType === 'integer' || columnType === 'real') {
+            return 'number';
+        } else if (columnType === 'boolean') {
+            return 'select';
+        } else {
+            return 'text';
+        }
+    }
+
+    // 根据列类型获取占位符
+    function getPlaceholder(columnType) {
+        switch (columnType) {
+            case 'string':
+                return '输入字符串值';
+            case 'integer':
+                return '输入整数值';
+            case 'real':
+                return '输入实数值';
+            case 'boolean':
+                return '请选择True或False';
+            case 'uuid':
+                return '输入UUID值';
+            default:
+                if (columnType.startsWith('set<')) {
+                    return '输入集合值，用逗号分隔';
+                } else if (columnType.startsWith('map<')) {
+                    return '输入映射值，格式：key1:value1,key2:value2';
+                }
+                return '输入值';
+        }
+    }
+
+    // 显示策略配置
+    function showStrategyConfig() {
+        const strategyType = document.getElementById('strategy_type').value;
+        const configs = document.querySelectorAll('#uniform_config, #poisson_config, #burst_config');
+
+        // 隐藏所有配置
+        configs.forEach(config => {
+            config.classList.add('hidden');
+        });
+
+        // 显示选中的配置
+        if (strategyType) {
+            const selectedConfig = document.getElementById(strategyType + '_config');
+            if (selectedConfig) {
+                selectedConfig.classList.remove('hidden');
+            }
+        }
+    }
+
+    // 显示流表配置
+    function showFlowTableConfig() {
+        const flowTableType = document.getElementById('flow_table_type').value;
+        const configs = document.querySelectorAll('#string_flow_config, #binary_flow_config');
+
+        // 隐藏所有配置
+        configs.forEach(config => {
+            config.classList.add('hidden');
+        });
+
+        // 显示选中的配置
+        if (flowTableType) {
+            const selectedConfig = document.getElementById(flowTableType + '_flow_config');
+            if (selectedConfig) {
+                selectedConfig.classList.remove('hidden');
+            }
+        }
+    }
+
+    // 添加泊松分布配置行
+    function addPoissonRow() {
+        const container = document.getElementById('poisson_config_rows');
+        const newRow = document.createElement('div');
+        newRow.className = 'poisson-row';
+        newRow.innerHTML = `
+                <div class="form-row">
+                    <div class="form-item">
+                        <label class="form-label">持续时间(秒)</label>
+                        <input type="number" class="form-input poisson-duration" value="3600" min="1">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">QPS</label>
+                        <input type="number" class="form-input poisson-qps" value="500" min="1">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">操作</label>
+                        <button type="button" class="btn btn-remove" onclick="removePoissonRow(this)">删除</button>
+                    </div>
+                </div>
+            `;
+        container.appendChild(newRow);
+    }
+
+    // 删除泊松分布配置行
+    function removePoissonRow(button) {
+        const container = document.getElementById('poisson_config_rows');
+        const rows = container.querySelectorAll('.poisson-row');
+
+        // 至少保留一行
+        if (rows.length > 1) {
+            button.closest('.poisson-row').remove();
+        } else {
+            alert('至少需要保留一行配置');
+        }
+    }
+
+    // 添加流表配置行
+    function addFlowRow(type) {
+        const container = document.getElementById(type + '_flow_rows');
+        const newRow = document.createElement('div');
+        newRow.className = 'flow-row';
+
+        if (type === 'string') {
+            newRow.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label">流表规则</label>
+                            <input type="text" class="form-input flow-rule-input string-flow-rule" placeholder="table=0,priority=100,in_port=1,actions=output:2">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">操作</label>
+                            <button type="button" class="btn btn-remove" onclick="removeFlowRow(this)">删除</button>
+                        </div>
+                    </div>
+                `;
+        } else if (type === 'binary') {
+            newRow.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label">流表规则</label>
+                            <input type="text" class="form-input flow-rule-input binary-flow-rule" placeholder="0100000c 00000000 00000001 00000002">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">操作</label>
+                            <button type="button" class="btn btn-remove" onclick="removeFlowRow(this)">删除</button>
+                        </div>
+                    </div>
+                `;
+        }
+
+        container.appendChild(newRow);
+    }
+
+    // 删除流表配置行
+    function removeFlowRow(button) {
+        const container = button.closest('.strategy-config').querySelector('[id$="_flow_rows"]');
+        const rows = container.querySelectorAll('.flow-row');
+
+        // 允许删除所有流表配置行，OpenFlow流表配置为可选
+        button.closest('.flow-row').remove();
+    }
+
+    // 获取选中的流量策略
+    function getSelectedTrafficStrategy() {
+        const strategyType = document.getElementById('strategy_type').value;
+        if (!strategyType) return null;
+
+        switch (strategyType) {
+            case 'uniform':
+                return {
+                    type: 'uniform',
+                    device_count: parseInt(document.getElementById('uniform_device_count').value),
+                    qps: parseInt(document.getElementById('uniform_qps').value)
+                };
+            case 'poisson':
+                try {
+                    const config = [];
+                    const rows = document.querySelectorAll('#poisson_config .poisson-row');
+                    rows.forEach((row, index) => {
+                        const duration = parseInt(row.querySelector('.poisson-duration').value);
+                        const qps = parseInt(row.querySelector('.poisson-qps').value);
+                        if (duration && qps) {
+                            config.push({ index, duration, qps });
+                        }
+                    });
+                    return {
+                        type: 'poisson',
+                        config: config
+                    };
+                } catch (e) {
+                    throw new Error('泊松分布配置格式错误');
+                }
+            case 'burst':
+                return {
+                    type: 'burst',
+                    device_count: parseInt(document.getElementById('burst_device_count').value),
+                    duration: parseInt(document.getElementById('burst_duration').value)
+                };
+            default:
+                return null;
+        }
+    }
+
+    // 获取选中的 OVSDB 表列和数据
+    function getSelectedTableColumns() {
+        const result = {};
+
+        // 收集所有配置单元的数据
+        const rows = document.querySelectorAll('#ovsdb_data_rows .ovsdb-row');
+        rows.forEach(row => {
+            const tableSelect = row.querySelector('.ovsdb-table-select');
+            const selectedTable = tableSelect ? tableSelect.value : null;
+
+            if (!selectedTable) return;
+
+            // 获取该行选中的列
+            const checkboxes = row.querySelectorAll('.column-checkbox:checked');
+            const columns = [];
+            checkboxes.forEach(checkbox => {
+                columns.push({
+                    name: checkbox.dataset.column,
+                    type: ovsdbSchema[selectedTable].columns[checkbox.dataset.column].type
+                });
+            });
+
+            if (columns.length === 0) return;
+
+            // 初始化表数据结构
+            if (!result[selectedTable]) {
+                result[selectedTable] = {
+                    columns: columns,
+                    data: []
+                };
+            }
+
+            // 收集该行的数据
+            const rowData = {};
+            const inputs = row.querySelectorAll('.ovsdb-column-input input, .ovsdb-column-input select, .ovsdb-column-input .boolean-input-container');
+            inputs.forEach(input => {
+                const columnName = input.dataset.column;
+                const columnType = input.dataset.type;
+                let value;
+
+                // 根据类型获取值
+                if (columnType === 'boolean') {
+                    // 处理布尔值单选按钮
+                    const selectedRadio = input.querySelector('input[type="radio"]:checked');
+                    if (selectedRadio) {
+                        value = selectedRadio.value === 'true' ? true : false;
+                    } else {
+                        value = null; // 未选择时设为null
+                    }
+                } else {
+                    // 处理其他类型的输入
+                    value = input.value.trim();
+
+                    // 根据类型转换值
+                    if (columnType === 'integer') {
+                        value = value ? parseInt(value) : 0;
+                    } else if (columnType === 'real') {
+                        value = value ? parseFloat(value) : 0.0;
+                    } else if (columnType.startsWith('set<')) {
+                        value = value ? value.split(',').map(v => v.trim()) : [];
+                    } else if (columnType.startsWith('map<')) {
+                        value = value ? parseMapValue(value) : {};
+                    }
+                }
+
+                // 只添加有值的字段
+                if (value !== null && value !== '') {
+                    rowData[columnName] = value;
+                }
+            });
+
+            result[selectedTable].data.push(rowData);
+        });
+
+        return result;
+    }
+
+    // 解析映射值
+    function parseMapValue(mapString) {
+        const map = {};
+        if (!mapString) return map;
+
+        const pairs = mapString.split(',');
+        pairs.forEach(pair => {
+            const [key, value] = pair.split(':').map(s => s.trim());
+            if (key && value !== undefined) {
+                map[key] = value;
+            }
+        });
+        return map;
+    }
+
+    // 获取流表配置
+    function getFlowTableConfig() {
+        const flowTableType = document.getElementById('flow_table_type').value;
+
+        if (flowTableType === 'string') {
+            const rules = [];
+            const rows = document.querySelectorAll('#string_flow_rows .string-flow-rule');
+            rows.forEach(input => {
+                if (input.value.trim()) {
+                    rules.push(input.value.trim());
+                }
+            });
+            return {
+                type: 'string',
+                data: rules
+            };
+        } else if (flowTableType === 'binary') {
+            const rules = [];
+            const rows = document.querySelectorAll('#binary_flow_rows .binary-flow-rule');
+            rows.forEach(input => {
+                if (input.value.trim()) {
+                    rules.push(input.value.trim());
+                }
+            });
+            return {
+                type: 'binary',
+                data: rules
+            };
+        }
+
+        return null;
+    }
+
+    // 生成配置 JSON
+    function generateConfig() {
+        const config = {
+            device_config: {
+                sn: document.getElementById('device_sn').value,
+                fw_version: document.getElementById('fw_version').value,
+                hw_version: document.getElementById('hw_version').value,
+                model: document.getElementById('device_model').value,
+                vendor: document.getElementById('vendor').value,
+                kit_version: document.getElementById('kit_version').value,
+                http_ip: document.getElementById('http_ip').value,
+                http_port: parseInt(document.getElementById('http_port').value)
+            },
+            traffic_strategy: getSelectedTrafficStrategy(),
+            ovsdb_tables: getSelectedTableColumns(),
+            flow_table: getFlowTableConfig()
+        };
+
+        return config;
+    }
+
+    // 配置合法性校验
+    function validateConfig() {
+        // 校验设备配置（必填）
+        const deviceValidation = validateDeviceConfig();
+        if (!deviceValidation.valid) {
+            return deviceValidation;
+        }
+
+        // 校验压力策略（必填）
+        const strategyValidation = validateTrafficStrategy();
+        if (!strategyValidation.valid) {
+            return strategyValidation;
+        }
+
+        // OpenFlow流表配置和OVSDB配置为可选，不进行严格校验
+        // 但可以添加格式校验
+        const flowValidation = validateFlowTableConfig();
+        if (!flowValidation.valid) {
+            return flowValidation;
+        }
+
+        const ovsdbValidation = validateOVSDBConfig();
+        if (!ovsdbValidation.valid) {
+            return ovsdbValidation;
+        }
+
+        return { valid: true, message: '配置校验通过' };
+    }
+
+    // 校验设备配置
+    function validateDeviceConfig() {
+        const requiredFields = [
+            { id: 'device_sn', name: '设备SN' },
+            { id: 'fw_version', name: '固件版本' },
+            { id: 'hw_version', name: '硬件版本' },
+            { id: 'device_model', name: '设备型号' },
+            { id: 'vendor', name: '厂商' },
+            { id: 'kit_version', name: '工具包版本' },
+            { id: 'http_ip', name: 'HTTP IP' },
+            { id: 'http_port', name: 'HTTP端口' }
+        ];
+
+        for (const field of requiredFields) {
+            const element = document.getElementById(field.id);
+            if (!element || !element.value.trim()) {
+                return { valid: false, message: `${field.name}不能为空` };
+            }
+        }
+
+        // 校验HTTP端口是否为有效数字
+        const httpPort = document.getElementById('http_port').value;
+        if (isNaN(httpPort) || parseInt(httpPort) <= 0 || parseInt(httpPort) > 65535) {
+            return { valid: false, message: 'HTTP端口必须是1-65535之间的有效数字' };
+        }
+
+        // 校验IP地址格式（简单校验）
+        const httpIp = document.getElementById('http_ip').value;
+        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+        if (!ipRegex.test(httpIp)) {
+            return { valid: false, message: 'HTTP IP地址格式不正确' };
+        }
+
+        return { valid: true, message: '设备配置校验通过' };
+    }
+
+    // 校验压力策略
+    function validateTrafficStrategy() {
+        const strategyType = document.getElementById('strategy_type').value;
+        if (!strategyType) {
+            return { valid: false, message: '请选择压力策略类型' };
+        }
+
+        switch (strategyType) {
+            case 'uniform':
+                return validateUniformStrategy();
+            case 'poisson':
+                return validatePoissonStrategy();
+            case 'burst':
+                return validateBurstStrategy();
+            default:
+                return { valid: false, message: '未知的压力策略类型' };
+        }
+    }
+
+    // 校验均匀流量策略
+    function validateUniformStrategy() {
+        const deviceCount = document.getElementById('uniform_device_count').value;
+        const qps = document.getElementById('uniform_qps').value;
+
+        if (!deviceCount || isNaN(deviceCount) || parseInt(deviceCount) <= 0) {
+            return { valid: false, message: '设备数量必须是大于0的整数' };
+        }
+
+        if (!qps || isNaN(qps) || parseInt(qps) <= 0) {
+            return { valid: false, message: '平均QPS必须是大于0的整数' };
+        }
+
+        return { valid: true, message: '均匀流量策略校验通过' };
+    }
+
+    // 校验泊松分布策略
+    function validatePoissonStrategy() {
+        const rows = document.querySelectorAll('#poisson_config .poisson-row');
+        if (rows.length === 0) {
+            return { valid: false, message: '泊松分布配置不能为空' };
+        }
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const duration = row.querySelector('.poisson-duration').value;
+            const qps = row.querySelector('.poisson-qps').value;
+
+            if (!duration || isNaN(duration) || parseInt(duration) <= 0) {
+                return { valid: false, message: `第${i + 1}行：持续时间必须是大于0的整数` };
+            }
+
+            if (!qps || isNaN(qps) || parseInt(qps) <= 0) {
+                return { valid: false, message: `第${i + 1}行：QPS必须是大于0的整数` };
+            }
+        }
+
+        return { valid: true, message: '泊松分布策略校验通过' };
+    }
+
+    // 校验爆发分布策略
+    function validateBurstStrategy() {
+        const deviceCount = document.getElementById('burst_device_count').value;
+        const duration = document.getElementById('burst_duration').value;
+
+        if (!deviceCount || isNaN(deviceCount) || parseInt(deviceCount) <= 0) {
+            return { valid: false, message: '设备数量必须是大于0的整数' };
+        }
+
+        if (!duration || isNaN(duration) || parseInt(duration) <= 0) {
+            return { valid: false, message: '持续时间必须是大于0的整数' };
+        }
+
+        return { valid: true, message: '爆发分布策略校验通过' };
+    }
+
+    // 校验流表配置（可选，但需要格式正确）
+    function validateFlowTableConfig() {
+        const flowTableType = document.getElementById('flow_table_type').value;
+        if (!flowTableType) {
+            // 流表配置为可选，没有选择类型时直接通过
+            return { valid: true, message: '流表配置为可选' };
+        }
+
+        if (flowTableType === 'string') {
+            const rules = document.querySelectorAll('#string_flow_rows .string-flow-rule');
+            for (let i = 0; i < rules.length; i++) {
+                const rule = rules[i].value.trim();
+                if (rule && !rule.includes('table=')) {
+                    return { valid: false, message: `第${i + 1}行字符串流表规则格式不正确，应包含table=字段` };
+                }
+            }
+        } else if (flowTableType === 'binary') {
+            const rules = document.querySelectorAll('#binary_flow_rows .binary-flow-rule');
+            for (let i = 0; i < rules.length; i++) {
+                const rule = rules[i].value.trim();
+                if (rule && !/^[0-9a-fA-F\s]+$/.test(rule)) {
+                    return { valid: false, message: `第${i + 1}行二进制流表规则格式不正确，应包含十六进制字符` };
+                }
+            }
+        }
+
+        return { valid: true, message: '流表配置校验通过' };
+    }
+
+    // 校验OVSDB配置（可选，但需要格式正确）
+    function validateOVSDBConfig() {
+        const rows = document.querySelectorAll('#ovsdb_data_rows .ovsdb-row');
+        if (rows.length === 0) {
+            // OVSDB配置为可选，没有配置时直接通过
+            return { valid: true, message: 'OVSDB配置为可选' };
+        }
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const tableSelect = row.querySelector('.ovsdb-table-select');
+            const selectedTable = tableSelect ? tableSelect.value : null;
+
+            // 如果选择了表但没有选择列，跳过这个配置单元
+            if (selectedTable) {
+                const checkboxes = row.querySelectorAll('.column-checkbox:checked');
+                if (checkboxes.length === 0) {
+                    // 选择了表但没有选择列，跳过这个配置单元
+                    continue;
+                }
+
+                // 校验数据输入（只校验有值的字段）
+                const inputs = row.querySelectorAll('.ovsdb-column-input input');
+                for (let j = 0; j < inputs.length; j++) {
+                    const input = inputs[j];
+                    const columnType = input.dataset.type;
+                    const value = input.value.trim();
+
+                    // 只校验非空值
+                    if (value) {
+                        if (columnType === 'integer' && isNaN(value)) {
+                            return { valid: false, message: `第${i + 1}个配置单元第${j + 1}列：整数类型字段值必须是数字` };
+                        }
+
+                        if (columnType === 'real' && isNaN(value)) {
+                            return { valid: false, message: `第${i + 1}个配置单元第${j + 1}列：实数类型字段值必须是数字` };
+                        }
+                    }
+                }
+            }
+        }
+
+        return { valid: true, message: 'OVSDB配置校验通过' };
+    }
+
+    // 显示状态消息
+    function showStatus(message, type = 'success') {
+        const statusDiv = document.getElementById('status-message');
+        statusDiv.className = `status-message status-${type}`;
+        statusDiv.textContent = message;
+        statusDiv.classList.remove('hidden');
+
+        setTimeout(() => {
+            statusDiv.classList.add('hidden');
+        }, 3000);
+    }
+
+    // 显示弹窗
+    function showModal(title, message, type = 'success') {
+        const modal = document.getElementById('modal');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+
+        // 设置图标和样式
+        modalIcon.className = `modal-icon ${type}`;
+        if (type === 'success') {
+            modalIcon.textContent = '✓';
+        } else if (type === 'error') {
+            modalIcon.textContent = '✕';
+        } else if (type === 'warning') {
+            modalIcon.textContent = '!';
+        }
+
+        // 设置标题和消息
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+
+        // 显示弹窗
+        modal.style.display = 'block';
+
+        // 点击背景关闭弹窗
+        modal.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    }
+
+    // 关闭弹窗
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.style.display = 'none';
+    }
+
+    // ESC键关闭弹窗
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // 保存配置
+    function saveConfig() {
+        try {
+            // 先进行合法性校验
+            const validationResult = validateConfig();
+            if (!validationResult.valid) {
+                showModal('配置校验失败', validationResult.message, 'error');
+                return;
+            }
+
+            const config = generateConfig();
+            const configJson = JSON.stringify(config, null, 2);
+
+            // 模拟保存到文件
+            const blob = new Blob([configJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showModal('保存成功', '配置文件已成功保存并下载', 'success');
+        } catch (error) {
+            showModal('保存失败', '保存配置时发生错误：' + error.message, 'error');
+        }
+    }
+
+    // 编译项目
+    function compileProject() {
+        showModal('编译中', '正在编译项目，请稍候...', 'warning');
+        setTimeout(() => {
+            closeModal();
+            showModal('编译完成', '项目编译成功完成', 'success');
+        }, 2000);
+    }
+
+    // 运行测试
+    function runTest() {
+        showModal('运行中', '正在启动测试，请稍候...', 'warning');
+        setTimeout(() => {
+            closeModal();
+            showModal('测试已启动', '测试程序已成功启动', 'success');
+        }, 1500);
+    }
+</script>
+</body>
+</html>
