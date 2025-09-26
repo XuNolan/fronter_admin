@@ -283,20 +283,41 @@
 
         .action-buttons {
             position: fixed;
-            bottom: 20px;
+            top: 50%;
             right: 20px;
+            transform: translateY(-50%);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
             z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 5px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
+            min-width: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .btn-primary {
@@ -315,7 +336,20 @@
         }
 
         .btn:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-success:hover {
+            background: #218838;
         }
 
         .hidden {
@@ -498,6 +532,46 @@
 
         .modal-btn-secondary:hover {
             background-color: #545b62;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .action-buttons {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                top: auto;
+                transform: none;
+                flex-direction: row;
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .action-title {
+                display: none;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.8rem;
+                min-width: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px;
+            }
         }
     </style>
 </head>
@@ -691,6 +765,7 @@
 
 <!-- 操作按钮 -->
 <div class="action-buttons">
+    <div class="action-title">操作面板</div>
     <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
     <button class="btn btn-secondary" onclick="compileProject()">编译</button>
     <button class="btn btn-success" onclick="runTest()">运行</button>
@@ -1654,7 +1729,7 @@
     });
 
     // 保存配置
-    function saveConfig() {
+    async function saveConfig() {
         try {
             // 先进行合法性校验
             const validationResult = validateConfig();
@@ -1666,19 +1741,76 @@
             const config = generateConfig();
             const configJson = JSON.stringify(config, null, 2);
 
-            // 模拟保存到文件
-            const blob = new Blob([configJson], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'config.json';
-            a.click();
-            URL.revokeObjectURL(url);
+            // 显示保存中的状态
+            showModal('保存中', '正在保存配置文件...', 'warning');
 
-            showModal('保存成功', '配置文件已成功保存并下载', 'success');
+            try {
+                // 尝试通过API保存到服务器
+                const response = await fetch('http://localhost:3001/api/save-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: configJson
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    showModal('保存成功', '配置文件已成功保存到项目根目录', 'success');
+                } else {
+                    throw new Error(`服务器错误: ${response.status}`);
+                }
+            } catch (apiError) {
+                // 如果API不可用，回退到本地存储方案
+                console.warn('API保存失败，使用本地存储:', apiError);
+                
+                // 保存到localStorage作为备份
+                localStorage.setItem('config_backup', configJson);
+                
+                // 尝试使用File System Access API（现代浏览器支持）
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const fileHandle = await window.showSaveFilePicker({
+                            suggestedName: 'config.json',
+                            types: [{
+                                description: 'JSON files',
+                                accept: { 'application/json': ['.json'] }
+                            }]
+                        });
+                        
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(configJson);
+                        await writable.close();
+                        
+                        closeModal();
+                        showModal('保存成功', '配置文件已保存到本地', 'success');
+                    } catch (fileError) {
+                        // 如果用户取消或API不支持，回退到下载
+                        fallbackToDownload(configJson);
+                    }
+                } else {
+                    // 浏览器不支持File System Access API，回退到下载
+                    fallbackToDownload(configJson);
+                }
+            }
         } catch (error) {
+            closeModal();
             showModal('保存失败', '保存配置时发生错误：' + error.message, 'error');
         }
+    }
+
+    // 回退到下载方案
+    function fallbackToDownload(configJson) {
+        const blob = new Blob([configJson], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'config.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        closeModal();
+        showModal('保存成功', '配置文件已下载，请手动放置到项目根目录', 'success');
     }
 
     // 编译项目
