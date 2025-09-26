@@ -1,5 +1,81 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
+
+// 编译C项目的函数
+async function compileCProject(projectPath) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // 检查项目路径是否存在
+            await fs.access(projectPath);
+            
+            // 检查是否存在Makefile
+            const makefilePath = path.join(projectPath, 'Makefile');
+            const cmakePath = path.join(projectPath, 'CMakeLists.txt');
+            
+            let compileCommand, compileArgs;
+            
+            try {
+                await fs.access(makefilePath);
+                // 使用Makefile编译
+                compileCommand = 'make';
+                compileArgs = ['-C', projectPath];
+                console.log('使用Makefile编译');
+            } catch (makeError) {
+                try {
+                    await fs.access(cmakePath);
+                    // 使用CMake编译
+                    compileCommand = 'cmake';
+                    compileArgs = ['--build', projectPath];
+                    console.log('使用CMake编译');
+                } catch (cmakeError) {
+                    // 尝试使用gcc编译所有.c文件
+                    compileCommand = 'gcc';
+                    compileArgs = ['-o', 'main', '*.c'];
+                    console.log('使用GCC编译所有.c文件');
+                }
+            }
+            
+            console.log(`执行编译命令: ${compileCommand} ${compileArgs.join(' ')}`);
+            
+            const compileProcess = spawn(compileCommand, compileArgs, {
+                cwd: projectPath,
+                shell: true,
+                stdio: 'pipe'
+            });
+            
+            let output = '';
+            let errorOutput = '';
+            
+            compileProcess.stdout.on('data', (data) => {
+                output += data.toString();
+            });
+            
+            compileProcess.stderr.on('data', (data) => {
+                errorOutput += data.toString();
+            });
+            
+            compileProcess.on('close', (code) => {
+                if (code === 0) {
+                    resolve({
+                        success: true,
+                        output: output,
+                        error: errorOutput
+                    });
+                } else {
+                    reject(new Error(`编译失败，退出码: ${code}\n错误输出: ${errorOutput}`));
+                }
+            });
+            
+            compileProcess.on('error', (error) => {
+                reject(new Error(`编译进程启动失败: ${error.message}`));
+            });
+            
+        } catch (error) {
+            reject(new Error(`项目路径检查失败: ${error.message}`));
+        }
+    });
+}
 
 export function fileSavePlugin() {
     return {
@@ -73,6 +149,90 @@ export function fileSavePlugin() {
                             res.statusCode = 500;
                             res.end(JSON.stringify({ success: false, message: '读取配置文件失败: ' + error.message }));
                         }
+                    }
+                } else {
+                    next();
+                }
+            });
+
+            // 添加编译项目的API
+            server.middlewares.use('/api/compile', async (req, res, next) => {
+                if (req.method === 'POST') {
+                    try {
+                        let body = '';
+                        req.on('data', chunk => {
+                            body += chunk.toString();
+                        });
+                        
+                        req.on('end', async () => {
+                            try {
+                                const { configData, cProjectPath, configFileName = 'config.json' } = JSON.parse(body);
+                                
+                                // 确保C项目路径存在
+                                if (!cProjectPath) {
+                                    throw new Error('C项目路径不能为空');
+                                }
+                                
+                                // 解析目标目录路径
+                                let targetDir;
+                                if (path.isAbsolute(cProjectPath)) {
+                                    // 绝对路径
+                                    targetDir = cProjectPath;
+                                } else {
+                                    // 相对路径，相对于当前工作目录
+                                    targetDir = path.resolve(process.cwd(), cProjectPath);
+                                }
+                                
+                                console.log(`目标C项目路径: ${targetDir}`);
+                                
+                                // 检查目标目录是否存在，如果不存在则创建
+                                try {
+                                    await fs.access(targetDir);
+                                    console.log('目标目录已存在');
+                                } catch (error) {
+                                    console.log('目标目录不存在，正在创建...');
+                                    await fs.mkdir(targetDir, { recursive: true });
+                                    console.log('目标目录创建成功');
+                                }
+                                
+                                // 保存配置文件到C项目目录
+                                const configPath = path.join(targetDir, configFileName);
+                                const configJson = JSON.stringify(configData, null, 2);
+                                await fs.writeFile(configPath, configJson, 'utf8');
+                                
+                                console.log(`配置文件已保存到C项目: ${configPath}`);
+                                
+                                // 编译C项目
+                                const compileResult = await compileCProject(targetDir);
+                                
+                                res.setHeader('Content-Type', 'application/json');
+                                res.setHeader('Access-Control-Allow-Origin', '*');
+                                res.end(JSON.stringify({ 
+                                    success: true, 
+                                    message: 'C项目编译完成',
+                                    configPath: configPath,
+                                    compileOutput: compileResult
+                                }));
+                            } catch (error) {
+                                console.error('编译C项目失败:', error);
+                                res.setHeader('Content-Type', 'application/json');
+                                res.setHeader('Access-Control-Allow-Origin', '*');
+                                res.statusCode = 500;
+                                res.end(JSON.stringify({ 
+                                    success: false, 
+                                    message: '编译C项目失败: ' + error.message 
+                                }));
+                            }
+                        });
+                    } catch (error) {
+                        console.error('处理编译请求失败:', error);
+                        res.setHeader('Content-Type', 'application/json');
+                        res.setHeader('Access-Control-Allow-Origin', '*');
+                        res.statusCode = 500;
+                        res.end(JSON.stringify({ 
+                            success: false, 
+                            message: '处理编译请求失败: ' + error.message 
+                        }));
                     }
                 } else {
                     next();

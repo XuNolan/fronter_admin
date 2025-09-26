@@ -621,6 +621,11 @@
                 <label class="form-label">HTTP Port</label>
                 <input type="number" class="form-input" id="http_port" value="8888">
             </div>
+
+            <div class="form-group">
+                <label class="form-label">C项目路径</label>
+                <input type="text" class="form-input" id="c_project_path" value="../zagent_c" placeholder="请输入C项目路径">
+            </div>
         </div>
 
         <div class="column column-strategy">
@@ -1447,7 +1452,8 @@
                 vendor: document.getElementById('vendor').value,
                 kit_version: document.getElementById('kit_version').value,
                 http_ip: document.getElementById('http_ip').value,
-                http_port: parseInt(document.getElementById('http_port').value)
+                http_port: parseInt(document.getElementById('http_port').value),
+                c_project_path: document.getElementById('c_project_path').value
             },
             traffic_strategy: getSelectedTrafficStrategy(),
             ovsdb_tables: getSelectedTableColumns(),
@@ -1496,7 +1502,8 @@
             { id: 'vendor', name: '厂商' },
             { id: 'kit_version', name: '工具包版本' },
             { id: 'http_ip', name: 'HTTP IP' },
-            { id: 'http_port', name: 'HTTP端口' }
+            { id: 'http_port', name: 'HTTP端口' },
+            { id: 'c_project_path', name: 'C项目路径' }
         ];
 
         for (const field of requiredFields) {
@@ -1814,12 +1821,67 @@
     }
 
     // 编译项目
-    function compileProject() {
-        showModal('编译中', '正在编译项目，请稍候...', 'warning');
-        setTimeout(() => {
+    async function compileProject() {
+        try {
+            // 先进行合法性校验
+            const validationResult = validateConfig();
+            if (!validationResult.valid) {
+                showModal('配置校验失败', validationResult.message, 'error');
+                return;
+            }
+
+            const config = generateConfig();
+            
+            // 显示编译中的状态
+            showModal('编译中', '正在保存配置并编译C项目...', 'warning');
+
+            try {
+                // 调用编译API
+                const response = await fetch('/api/compile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        configData: config,
+                        cProjectPath: getCProjectPath(), // 从配置中获取C项目路径
+                        configFileName: 'config.json'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeModal();
+                    showModal('编译成功', 
+                        `C项目编译完成！\n配置文件已保存到: ${result.configPath}\n编译输出: ${result.compileOutput.output || '无输出'}`, 
+                        'success');
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (apiError) {
+                closeModal();
+                showModal('编译失败', '编译C项目时发生错误：' + apiError.message, 'error');
+            }
+        } catch (error) {
             closeModal();
-            showModal('编译完成', '项目编译成功完成', 'success');
-        }, 2000);
+            showModal('编译失败', '编译过程中发生错误：' + error.message, 'error');
+        }
+    }
+
+    // 获取C项目路径（可以从配置中读取或设置默认值）
+    function getCProjectPath() {
+        // 这里可以从页面配置中读取，或者设置默认路径
+        // 您可以根据需要修改这个路径
+        const defaultPath = '../zagent_c'; // 相对于当前项目的路径
+        
+        // 如果页面中有配置C项目路径的输入框，可以从那里读取
+        const cProjectPathInput = document.getElementById('c_project_path');
+        if (cProjectPathInput && cProjectPathInput.value.trim()) {
+            return cProjectPathInput.value.trim();
+        }
+        
+        return defaultPath;
     }
 
     // 运行测试
