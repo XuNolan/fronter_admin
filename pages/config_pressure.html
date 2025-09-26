@@ -1746,7 +1746,7 @@
 
             try {
                 // 尝试通过API保存到服务器
-                const response = await fetch('http://localhost:3001/api/save-config', {
+                const response = await fetch('/api/save-config', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
