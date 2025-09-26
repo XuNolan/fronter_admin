@@ -772,6 +772,7 @@
 <div class="action-buttons">
     <div class="action-title">操作面板</div>
     <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+    <button class="btn btn-secondary" onclick="downloadConfig()">下载配置</button>
     <button class="btn btn-secondary" onclick="compileProject()">编译</button>
     <button class="btn btn-success" onclick="runTest()">运行</button>
 </div>
@@ -1882,6 +1883,34 @@
         }
         
         return defaultPath;
+    }
+
+    // 下载配置文件
+    function downloadConfig() {
+        try {
+            // 先进行合法性校验
+            const validationResult = validateConfig();
+            if (!validationResult.valid) {
+                showModal('配置校验失败', validationResult.message, 'error');
+                return;
+            }
+
+            const config = generateConfig();
+            const configJson = JSON.stringify(config, null, 2);
+            
+            // 创建下载链接
+            const blob = new Blob([configJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showModal('下载成功', '配置文件已开始下载', 'success');
+        } catch (error) {
+            showModal('下载失败', '下载配置文件时发生错误：' + error.message, 'error');
+        }
     }
 
     // 运行测试

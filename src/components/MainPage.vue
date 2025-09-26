@@ -71,9 +71,12 @@ export default {
                 },
                 {
                     "label": "压测任务详情",
-                    "url": "/pressure/query/:id",
-                    "icon": "fa fa-info-circle",
-                    "schemaApi": "get:/pages/pressure-info.json"
+                    "type": "page",
+                    "body": {
+                      "type": "iframe",
+                      "src": "/pages/pressure_info.html",
+                      "height": "100vh"
+                    }
                 }
               ]
             }
