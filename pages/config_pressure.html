@@ -1914,12 +1914,47 @@
     }
 
     // 运行测试
-    function runTest() {
-        showModal('运行中', '正在启动测试，请稍候...', 'warning');
-        setTimeout(() => {
+    async function runTest() {
+        try {
+            // 先进行合法性校验
+            const validationResult = validateConfig();
+            if (!validationResult.valid) {
+                showModal('配置校验失败', validationResult.message, 'error');
+                return;
+            }
+
+            // 显示运行中的状态
+            showModal('运行中', '正在启动测试程序...', 'warning');
+
+            try {
+                // 调用运行API
+                const response = await fetch('/api/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cProjectPath: getCProjectPath()
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeModal();
+                    // 跳转到压力信息页面
+                    window.location.href = 'pressure_info.html';
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (apiError) {
+                closeModal();
+                showModal('运行失败', '启动测试程序时发生错误：' + apiError.message, 'error');
+            }
+        } catch (error) {
             closeModal();
-            showModal('测试已启动', '测试程序已成功启动', 'success');
-        }, 1500);
+            showModal('运行失败', '运行过程中发生错误：' + error.message, 'error');
+        }
     }
 </script>
 </body>

@@ -239,6 +239,138 @@ export function fileSavePlugin() {
                 }
             });
 
+            // 添加运行项目的API
+            server.middlewares.use('/api/run', async (req, res, next) => {
+                if (req.method === 'POST') {
+                    try {
+                        let body = '';
+                        req.on('data', chunk => {
+                            body += chunk.toString();
+                        });
+                        
+                        req.on('end', async () => {
+                            try {
+                                const { cProjectPath } = JSON.parse(body);
+                                
+                                // 确保C项目路径存在
+                                if (!cProjectPath) {
+                                    throw new Error('C项目路径不能为空');
+                                }
+                                
+                                // 解析目标目录路径
+                                let targetDir;
+                                if (path.isAbsolute(cProjectPath)) {
+                                    targetDir = cProjectPath;
+                                } else {
+                                    targetDir = path.resolve(process.cwd(), cProjectPath);
+                                }
+                                
+                                console.log(`检查C项目路径: ${targetDir}`);
+                                
+                                // 检查目标目录是否存在
+                                try {
+                                    await fs.access(targetDir);
+                                } catch (error) {
+                                    throw new Error(`C项目目录不存在: ${targetDir}`);
+                                }
+                                
+                                // 查找可执行文件
+                                const possibleExecutables = ['zagent', 'main', 'a.out', 'program'];
+                                let executablePath = null;
+                                let executableName = null;
+                                
+                                for (const exeName of possibleExecutables) {
+                                    const exePath = path.join(targetDir, exeName);
+                                    try {
+                                        await fs.access(exePath);
+                                        // 检查文件是否可执行
+                                        const stats = await fs.stat(exePath);
+                                        if (stats.isFile()) {
+                                            executablePath = exePath;
+                                            executableName = exeName;
+                                            break;
+                                        }
+                                    } catch (error) {
+                                        // 文件不存在或不可访问，继续检查下一个
+                                        continue;
+                                    }
+                                }
+                                
+                                if (!executablePath) {
+                                    throw new Error('在C项目目录中未找到可执行文件。请先编译项目。');
+                                }
+                                
+                                console.log(`找到可执行文件: ${executablePath}`);
+                                
+                                // 执行可执行文件
+                                const { spawn } = await import('child_process');
+                                const runProcess = spawn(executablePath, [], {
+                                    cwd: targetDir,
+                                    stdio: 'pipe'
+                                });
+                                
+                                let output = '';
+                                let errorOutput = '';
+                                
+                                runProcess.stdout.on('data', (data) => {
+                                    output += data.toString();
+                                });
+                                
+                                runProcess.stderr.on('data', (data) => {
+                                    errorOutput += data.toString();
+                                });
+                                
+                                // 设置超时时间（30秒）
+                                const timeout = setTimeout(() => {
+                                    runProcess.kill();
+                                }, 30000);
+                                
+                                runProcess.on('close', (code) => {
+                                    clearTimeout(timeout);
+                                    console.log(`程序执行完成，退出码: ${code}`);
+                                });
+                                
+                                runProcess.on('error', (error) => {
+                                    clearTimeout(timeout);
+                                    console.error(`程序执行失败: ${error.message}`);
+                                });
+                                
+                                res.setHeader('Content-Type', 'application/json');
+                                res.setHeader('Access-Control-Allow-Origin', '*');
+                                res.end(JSON.stringify({ 
+                                    success: true, 
+                                    message: '程序已启动',
+                                    executablePath: executablePath,
+                                    executableName: executableName,
+                                    pid: runProcess.pid
+                                }));
+                                
+                            } catch (error) {
+                                console.error('运行API错误:', error);
+                                res.setHeader('Content-Type', 'application/json');
+                                res.setHeader('Access-Control-Allow-Origin', '*');
+                                res.statusCode = 400;
+                                res.end(JSON.stringify({ 
+                                    success: false, 
+                                    message: error.message 
+                                }));
+                            }
+                        });
+                    } catch (error) {
+                        console.error('运行API请求处理错误:', error);
+                        res.setHeader('Content-Type', 'application/json');
+                        res.setHeader('Access-Control-Allow-Origin', '*');
+                        res.statusCode = 500;
+                        res.end(JSON.stringify({ 
+                            success: false, 
+                            message: '服务器内部错误' 
+                        }));
+                    }
+                } else {
+                    next();
+                }
+            });
+
             // 处理OPTIONS请求（CORS预检）
             server.middlewares.use('/api', (req, res, next) => {
                 if (req.method === 'OPTIONS') {
