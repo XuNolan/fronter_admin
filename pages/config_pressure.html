@@ -282,20 +282,72 @@
         }
 
         .action-buttons {
-            position: fixed;
-            top: 50%;
-            right: 20px;
-            transform: translateY(-50%);
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
+            gap: 20px;
+            background: white;
+            border-radius: 8px;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .action-buttons-column {
+            flex: 1;
+        }
+
+        .action-buttons-content {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons.collapsed {
+            padding: 10px 20px;
+        }
+
+        .action-buttons.collapsed .action-buttons-column {
+            display: none;
+        }
+
+        .collapse-toggle {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .action-buttons.collapsed .collapse-toggle {
+            display: flex;
+        }
+
+        .collapse-toggle:hover {
+            background: #0056b3;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .collapse-toggle::before {
+            content: '▼';
+            transition: transform 0.3s ease;
+        }
+
+        .action-buttons:not(.collapsed) .collapse-toggle::before {
+            content: '▲';
         }
 
         .action-title {
@@ -534,38 +586,120 @@
             background-color: #545b62;
         }
 
+        /* SN策略配置样式 */
+        .sn-strategy-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sn-strategy-options {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .sn-strategy-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sn-strategy-radio {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .sn-strategy-label {
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sn-strategy-label:hover {
+            color: #333;
+        }
+
+        .sn-strategy-config {
+            margin-top: 10px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        .sn-strategy-config.hidden {
+            display: none;
+        }
+
+        .sn-strategy-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 10px;
+        }
+
+        .sn-strategy-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .sn-strategy-item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sn-strategy-item:last-child {
+            flex: 0 0 auto;
+            width: 80px;
+        }
+
+        .sn-strategy-checkbox {
+            margin-right: 5px;
+        }
+
+        .sn-strategy-checkbox-label {
+            font-size: 0.85rem;
+            color: #666;
+            cursor: pointer;
+            user-select: none;
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .action-buttons {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                top: auto;
-                transform: none;
-                flex-direction: row;
                 gap: 10px;
                 padding: 15px;
             }
 
-            .action-title {
-                display: none;
+            .action-buttons-content {
+                flex-wrap: wrap;
+                gap: 10px;
             }
 
             .btn {
                 padding: 10px 16px;
                 font-size: 0.8rem;
                 min-width: 80px;
+                flex: 1;
+            }
+
+            .sn-strategy-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
         }
 
         @media (max-width: 480px) {
             .action-buttons {
-                bottom: 10px;
-                right: 10px;
-                left: 10px;
-                flex-direction: column;
                 gap: 8px;
                 padding: 12px;
+            }
+
+            .action-buttons-content {
+                flex-direction: column;
+                gap: 8px;
             }
 
             .btn {
@@ -577,14 +711,88 @@
 </head>
 <body>
 <div class="container">
+    <!-- 操作面板 -->
+    <div class="action-buttons" id="action-buttons">
+        <button class="collapse-toggle" onclick="toggleActionPanel()"></button>
+        <div class="action-buttons-column">
+            <div class="column-title">操作面板</div>
+            <div class="action-buttons-content">
+                <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
+                <button class="btn btn-secondary" onclick="downloadConfig()">下载配置</button>
+                <button class="btn btn-secondary" onclick="compileProject()">编译</button>
+                <button class="btn btn-success" onclick="runTest()">运行</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 第一行：设备配置和压力策略 -->
     <div class="row">
         <div class="column column-compact">
             <div class="column-title">设备配置</div>
 
             <div class="form-group">
-                <label class="form-label">SN</label>
-                <input type="text" class="form-input" id="device_sn" value="092450775319979">
+                <label class="form-label">SN策略</label>
+                <div class="sn-strategy-container">
+                    <div class="sn-strategy-options">
+                        <div class="sn-strategy-option">
+                            <input type="radio" id="sn_fixed" name="sn_strategy" value="fixed" class="sn-strategy-radio" checked onchange="showSNStrategyConfig()">
+                            <label for="sn_fixed" class="sn-strategy-label">固定</label>
+                        </div>
+                        <div class="sn-strategy-option">
+                            <input type="radio" id="sn_random" name="sn_strategy" value="random" class="sn-strategy-radio" onchange="showSNStrategyConfig()">
+                            <label for="sn_random" class="sn-strategy-label">随机</label>
+                        </div>
+                        <div class="sn-strategy-option">
+                            <input type="radio" id="sn_increment" name="sn_strategy" value="increment" class="sn-strategy-radio" onchange="showSNStrategyConfig()">
+                            <label for="sn_increment" class="sn-strategy-label">递增</label>
+                        </div>
+                    </div>
+                    
+                    <!-- 固定策略配置 -->
+                    <div id="sn_fixed_config" class="sn-strategy-config">
+                        <div class="form-group">
+                            <label class="form-label">固定SN值</label>
+                            <input type="text" class="form-input" id="sn_fixed_value" value="092450775319979" placeholder="请输入固定的SN值">
+                        </div>
+                    </div>
+                    
+                    <!-- 随机策略配置 -->
+                    <div id="sn_random_config" class="sn-strategy-config hidden">
+                        <div class="form-group">
+                            <label class="form-label">长度</label>
+                            <input type="number" class="form-input" id="sn_random_length" value="15" min="1" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">字符类型</label>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <label class="sn-strategy-checkbox-label">
+                                    <input type="checkbox" id="sn_random_uppercase" class="sn-strategy-checkbox" checked>
+                                    大写字母
+                                </label>
+                                <label class="sn-strategy-checkbox-label">
+                                    <input type="checkbox" id="sn_random_lowercase" class="sn-strategy-checkbox" checked>
+                                    小写字母
+                                </label>
+                                <label class="sn-strategy-checkbox-label">
+                                    <input type="checkbox" id="sn_random_numbers" class="sn-strategy-checkbox" checked>
+                                    数字
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 递增策略配置 -->
+                    <div id="sn_increment_config" class="sn-strategy-config hidden">
+                        <div class="form-group">
+                            <label class="form-label">基础数值</label>
+                            <input type="number" class="form-input" id="sn_increment_base" value="92450775319979" placeholder="请输入基础数值" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">步长</label>
+                            <input type="number" class="form-input" id="sn_increment_step" value="1" min="1">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -766,15 +974,6 @@
             </div>
         </div>
     </div>
-</div>
-
-<!-- 操作按钮 -->
-<div class="action-buttons">
-    <div class="action-title">操作面板</div>
-    <button class="btn btn-primary" onclick="saveConfig()">保存配置</button>
-    <button class="btn btn-secondary" onclick="downloadConfig()">下载配置</button>
-    <button class="btn btn-secondary" onclick="compileProject()">编译</button>
-    <button class="btn btn-success" onclick="runTest()">运行</button>
 </div>
 
 <!-- 状态消息 -->
@@ -1155,6 +1354,29 @@
         }
     }
 
+    // 切换操作面板折叠状态
+    function toggleActionPanel() {
+        const actionButtons = document.getElementById('action-buttons');
+        actionButtons.classList.toggle('collapsed');
+    }
+
+    // 显示SN策略配置
+    function showSNStrategyConfig() {
+        const strategyType = document.querySelector('input[name="sn_strategy"]:checked').value;
+        const configs = document.querySelectorAll('#sn_fixed_config, #sn_random_config, #sn_increment_config');
+
+        // 隐藏所有配置
+        configs.forEach(config => {
+            config.classList.add('hidden');
+        });
+
+        // 显示选中的配置
+        const selectedConfig = document.getElementById('sn_' + strategyType + '_config');
+        if (selectedConfig) {
+            selectedConfig.classList.remove('hidden');
+        }
+    }
+
     // 显示策略配置
     function showStrategyConfig() {
         const strategyType = document.getElementById('strategy_type').value;
@@ -1442,11 +1664,46 @@
         return null;
     }
 
+    // 获取SN策略配置
+    function getSNStrategyConfig() {
+        const strategyType = document.querySelector('input[name="sn_strategy"]:checked').value;
+        
+        switch (strategyType) {
+            case 'fixed':
+                return {
+                    type: 'fixed',
+                    value: document.getElementById('sn_fixed_value').value
+                };
+            case 'random':
+                return {
+                    type: 'random',
+                    length: parseInt(document.getElementById('sn_random_length').value),
+                    character_types: {
+                        uppercase: document.getElementById('sn_random_uppercase').checked,
+                        lowercase: document.getElementById('sn_random_lowercase').checked,
+                        numbers: document.getElementById('sn_random_numbers').checked
+                    }
+                };
+            case 'increment':
+                return {
+                    type: 'increment',
+                    base: parseInt(document.getElementById('sn_increment_base').value),
+                    step: parseInt(document.getElementById('sn_increment_step').value),
+                    count: parseInt(document.getElementById('sn_increment_count').value)
+                };
+            default:
+                return {
+                    type: 'fixed',
+                    value: '092450775319979'
+                };
+        }
+    }
+
     // 生成配置 JSON
     function generateConfig() {
         const config = {
             device_config: {
-                sn: document.getElementById('device_sn').value,
+                sn_strategy: getSNStrategyConfig(),
                 fw_version: document.getElementById('fw_version').value,
                 hw_version: document.getElementById('hw_version').value,
                 model: document.getElementById('device_model').value,
@@ -1496,7 +1753,6 @@
     // 校验设备配置
     function validateDeviceConfig() {
         const requiredFields = [
-            { id: 'device_sn', name: '设备SN' },
             { id: 'fw_version', name: '固件版本' },
             { id: 'hw_version', name: '硬件版本' },
             { id: 'device_model', name: '设备型号' },
@@ -1514,6 +1770,12 @@
             }
         }
 
+        // 校验SN策略配置
+        const snValidation = validateSNStrategyConfig();
+        if (!snValidation.valid) {
+            return snValidation;
+        }
+
         // 校验HTTP端口是否为有效数字
         const httpPort = document.getElementById('http_port').value;
         if (isNaN(httpPort) || parseInt(httpPort) <= 0 || parseInt(httpPort) > 65535) {
@@ -1528,6 +1790,52 @@
         }
 
         return { valid: true, message: '设备配置校验通过' };
+    }
+
+    // 校验SN策略配置
+    function validateSNStrategyConfig() {
+        const strategyType = document.querySelector('input[name="sn_strategy"]:checked').value;
+        
+        switch (strategyType) {
+            case 'fixed':
+                const fixedValue = document.getElementById('sn_fixed_value').value;
+                if (!fixedValue || !fixedValue.trim()) {
+                    return { valid: false, message: '固定SN值不能为空' };
+                }
+                break;
+            case 'random':
+                const length = document.getElementById('sn_random_length').value;
+                const uppercase = document.getElementById('sn_random_uppercase').checked;
+                const lowercase = document.getElementById('sn_random_lowercase').checked;
+                const numbers = document.getElementById('sn_random_numbers').checked;
+                
+                if (!length || isNaN(length) || parseInt(length) <= 0) {
+                    return { valid: false, message: '随机SN长度必须是大于0的整数' };
+                }
+                if (!uppercase && !lowercase && !numbers) {
+                    return { valid: false, message: '随机SN至少需要选择一种字符类型' };
+                }
+                break;
+            case 'increment':
+                const base = document.getElementById('sn_increment_base').value;
+                const step = document.getElementById('sn_increment_step').value;
+                const incrementCount = document.getElementById('sn_increment_count').value;
+                
+                if (!base || isNaN(base) || parseInt(base) < 0) {
+                    return { valid: false, message: '递增SN基础值必须是大于等于0的数字' };
+                }
+                if (!step || isNaN(step) || parseInt(step) <= 0) {
+                    return { valid: false, message: '递增SN步长必须是大于0的整数' };
+                }
+                if (!incrementCount || isNaN(incrementCount) || parseInt(incrementCount) <= 0) {
+                    return { valid: false, message: '递增SN数量必须是大于0的整数' };
+                }
+                break;
+            default:
+                return { valid: false, message: '请选择SN策略' };
+        }
+        
+        return { valid: true, message: 'SN策略配置校验通过' };
     }
 
     // 校验压力策略
