@@ -1229,6 +1229,29 @@
         const dataContainer = row.querySelector('.ovsdb-row-data');
         const checkboxes = row.querySelectorAll('.column-checkbox:checked');
 
+        // 保存当前已输入的数据
+        const currentData = {};
+        const existingInputs = dataContainer.querySelectorAll('.ovsdb-column-input');
+        existingInputs.forEach(inputGroup => {
+            const input = inputGroup.querySelector('input, .boolean-input-container');
+            if (input) {
+                const columnName = input.dataset.column;
+                const columnType = input.dataset.type;
+                let value;
+
+                if (columnType === 'boolean') {
+                    const selectedRadio = input.querySelector('input[type="radio"]:checked');
+                    value = selectedRadio ? selectedRadio.value : null;
+                } else {
+                    value = input.value;
+                }
+
+                if (value !== null && value !== '') {
+                    currentData[columnName] = value;
+                }
+            }
+        });
+
         // 清空数据输入
         dataContainer.innerHTML = '';
 
@@ -1295,6 +1318,14 @@
                 // 添加到容器
                 input.appendChild(trueContainer);
                 input.appendChild(falseContainer);
+
+                // 恢复布尔值数据
+                if (currentData[columnName]) {
+                    const radioToCheck = input.querySelector(`input[value="${currentData[columnName]}"]`);
+                    if (radioToCheck) {
+                        radioToCheck.checked = true;
+                    }
+                }
             } else {
                 // 创建普通输入框
                 input = document.createElement('input');
@@ -1303,6 +1334,11 @@
                 input.placeholder = getPlaceholder(columnType);
                 input.dataset.column = columnName;
                 input.dataset.type = columnType;
+
+                // 恢复普通输入框数据
+                if (currentData[columnName]) {
+                    input.value = currentData[columnName];
+                }
             }
 
             columnInput.appendChild(label);
@@ -1333,6 +1369,10 @@
 
     // 根据列类型获取占位符
     function getPlaceholder(columnType) {
+        if (!columnType) {
+            return '输入值';
+        }
+        
         switch (columnType) {
             case 'string':
                 return '输入字符串值';
@@ -1597,9 +1637,9 @@
                         value = value ? parseInt(value) : 0;
                     } else if (columnType === 'real') {
                         value = value ? parseFloat(value) : 0.0;
-                    } else if (columnType.startsWith('set<')) {
+                    } else if (columnType && columnType.startsWith('set<')) {
                         value = value ? value.split(',').map(v => v.trim()) : [];
-                    } else if (columnType.startsWith('map<')) {
+                    } else if (columnType && columnType.startsWith('map<')) {
                         value = value ? parseMapValue(value) : {};
                     }
                 }
