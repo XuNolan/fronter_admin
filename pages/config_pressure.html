@@ -864,7 +864,7 @@
             <!-- 泊松分布配置 -->
             <div id="poisson_config" class="strategy-config hidden">
                 <div class="form-group">
-                    <label class="form-label">QPS 配置</label>
+                    <label class="form-label">上线设备数配置</label>
                     <div id="poisson_config_rows">
                         <div class="poisson-row">
                             <div class="form-row">
@@ -873,8 +873,8 @@
                                     <input type="number" class="form-input poisson-duration" value="3600" min="1">
                                 </div>
                                 <div class="form-item">
-                                    <label class="form-label">QPS</label>
-                                    <input type="number" class="form-input poisson-qps" value="500" min="1">
+                                    <label class="form-label">上线设备数</label>
+                                    <input type="number" class="form-input poisson-device-count" value="50" min="1">
                                 </div>
                                 <div class="form-item">
                                     <label class="form-label">操作</label>
@@ -892,10 +892,6 @@
                 <div class="form-group">
                     <label class="form-label">设备数量</label>
                     <input type="number" class="form-input" id="burst_device_count" value="50" min="1">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">持续时间(秒)</label>
-                    <input type="number" class="form-input" id="burst_duration" value="60" min="1">
                 </div>
             </div>
         </div>
@@ -1467,8 +1463,8 @@
                         <input type="number" class="form-input poisson-duration" value="3600" min="1">
                     </div>
                     <div class="form-item">
-                        <label class="form-label">QPS</label>
-                        <input type="number" class="form-input poisson-qps" value="500" min="1">
+                        <label class="form-label">上线设备数</label>
+                        <input type="number" class="form-input poisson-device-count" value="50" min="1">
                     </div>
                     <div class="form-item">
                         <label class="form-label">操作</label>
@@ -1556,9 +1552,9 @@
                     const rows = document.querySelectorAll('#poisson_config .poisson-row');
                     rows.forEach((row, index) => {
                         const duration = parseInt(row.querySelector('.poisson-duration').value);
-                        const qps = parseInt(row.querySelector('.poisson-qps').value);
-                        if (duration && qps) {
-                            config.push({ index, duration, qps });
+                        const deviceCount = parseInt(row.querySelector('.poisson-device-count').value);
+                        if (duration && deviceCount) {
+                            config.push({ index, duration, device_count: deviceCount });
                         }
                     });
                     return {
@@ -1571,8 +1567,7 @@
             case 'burst':
                 return {
                     type: 'burst',
-                    device_count: parseInt(document.getElementById('burst_device_count').value),
-                    duration: parseInt(document.getElementById('burst_duration').value)
+                    device_count: parseInt(document.getElementById('burst_device_count').value)
                 };
             default:
                 return null;
@@ -1728,8 +1723,7 @@
                 return {
                     type: 'increment',
                     base: parseInt(document.getElementById('sn_increment_base').value),
-                    step: parseInt(document.getElementById('sn_increment_step').value),
-                    count: parseInt(document.getElementById('sn_increment_count').value)
+                    step: parseInt(document.getElementById('sn_increment_step').value)
                 };
             default:
                 return {
@@ -1859,16 +1853,12 @@
             case 'increment':
                 const base = document.getElementById('sn_increment_base').value;
                 const step = document.getElementById('sn_increment_step').value;
-                const incrementCount = document.getElementById('sn_increment_count').value;
                 
                 if (!base || isNaN(base) || parseInt(base) < 0) {
                     return { valid: false, message: '递增SN基础值必须是大于等于0的数字' };
                 }
                 if (!step || isNaN(step) || parseInt(step) <= 0) {
                     return { valid: false, message: '递增SN步长必须是大于0的整数' };
-                }
-                if (!incrementCount || isNaN(incrementCount) || parseInt(incrementCount) <= 0) {
-                    return { valid: false, message: '递增SN数量必须是大于0的整数' };
                 }
                 break;
             default:
@@ -1923,14 +1913,14 @@
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             const duration = row.querySelector('.poisson-duration').value;
-            const qps = row.querySelector('.poisson-qps').value;
+            const deviceCount = row.querySelector('.poisson-device-count').value;
 
             if (!duration || isNaN(duration) || parseInt(duration) <= 0) {
                 return { valid: false, message: `第${i + 1}行：持续时间必须是大于0的整数` };
             }
 
-            if (!qps || isNaN(qps) || parseInt(qps) <= 0) {
-                return { valid: false, message: `第${i + 1}行：QPS必须是大于0的整数` };
+            if (!deviceCount || isNaN(deviceCount) || parseInt(deviceCount) <= 0) {
+                return { valid: false, message: `第${i + 1}行：上线设备数必须是大于0的整数` };
             }
         }
 
@@ -1940,14 +1930,9 @@
     // 校验爆发分布策略
     function validateBurstStrategy() {
         const deviceCount = document.getElementById('burst_device_count').value;
-        const duration = document.getElementById('burst_duration').value;
 
         if (!deviceCount || isNaN(deviceCount) || parseInt(deviceCount) <= 0) {
             return { valid: false, message: '设备数量必须是大于0的整数' };
-        }
-
-        if (!duration || isNaN(duration) || parseInt(duration) <= 0) {
-            return { valid: false, message: '持续时间必须是大于0的整数' };
         }
 
         return { valid: true, message: '爆发分布策略校验通过' };
