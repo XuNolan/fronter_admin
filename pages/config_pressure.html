@@ -1089,8 +1089,247 @@
         }
         // 初始化OVSDB配置区域
         initializeOVSDBConfig();
+        
+        // 尝试加载现有配置
+        await loadConfigFromJSON();
     });
 
+
+    // 从config.json加载配置
+    async function loadConfigFromJSON() {
+        try {
+            const response = await fetch('/config.json');
+            if (!response.ok) {
+                console.log('未找到config.json文件，使用默认配置');
+                return;
+            }
+            
+            const config = await response.json();
+            console.log('成功加载config.json:', config);
+            
+            // 加载设备配置
+            loadDeviceConfig(config.device_config);
+            
+            // 加载压力策略
+            loadTrafficStrategy(config.traffic_strategy);
+            
+            // 加载OVSDB配置
+            loadOVSDBConfig(config.ovsdb_tables);
+            
+            // 加载流表配置
+            loadFlowTableConfig(config.flow_table);
+            
+        } catch (error) {
+            console.log('加载config.json失败:', error);
+        }
+    }
+
+    // 加载设备配置
+    function loadDeviceConfig(deviceConfig) {
+        if (!deviceConfig) return;
+        
+        // 加载SN策略
+        if (deviceConfig.sn_strategy) {
+            const strategyType = deviceConfig.sn_strategy.type;
+            const strategyRadio = document.querySelector(`input[name="sn_strategy"][value="${strategyType}"]`);
+            if (strategyRadio) {
+                strategyRadio.checked = true;
+                showSNStrategyConfig();
+                
+                // 根据策略类型设置具体值
+                switch (strategyType) {
+                    case 'fixed':
+                        document.getElementById('sn_fixed_value').value = deviceConfig.sn_strategy.value || '';
+                        break;
+                    case 'random':
+                        document.getElementById('sn_random_length').value = deviceConfig.sn_strategy.length || 15;
+                        if (deviceConfig.sn_strategy.character_types) {
+                            document.getElementById('sn_random_uppercase').checked = deviceConfig.sn_strategy.character_types.uppercase || false;
+                            document.getElementById('sn_random_lowercase').checked = deviceConfig.sn_strategy.character_types.lowercase || false;
+                            document.getElementById('sn_random_numbers').checked = deviceConfig.sn_strategy.character_types.numbers || false;
+                        }
+                        break;
+                    case 'increment':
+                        document.getElementById('sn_increment_base').value = deviceConfig.sn_strategy.base || 0;
+                        document.getElementById('sn_increment_step').value = deviceConfig.sn_strategy.step || 1;
+                        break;
+                }
+            }
+        }
+        
+        // 加载其他设备配置
+        if (deviceConfig.fw_version) document.getElementById('fw_version').value = deviceConfig.fw_version;
+        if (deviceConfig.hw_version) document.getElementById('hw_version').value = deviceConfig.hw_version;
+        if (deviceConfig.model) document.getElementById('device_model').value = deviceConfig.model;
+        if (deviceConfig.vendor) document.getElementById('vendor').value = deviceConfig.vendor;
+        if (deviceConfig.kit_version) document.getElementById('kit_version').value = deviceConfig.kit_version;
+        if (deviceConfig.http_ip) document.getElementById('http_ip').value = deviceConfig.http_ip;
+        if (deviceConfig.http_port) document.getElementById('http_port').value = deviceConfig.http_port;
+        if (deviceConfig.c_project_path) document.getElementById('c_project_path').value = deviceConfig.c_project_path;
+    }
+
+    // 加载压力策略
+    function loadTrafficStrategy(trafficStrategy) {
+        if (!trafficStrategy) return;
+        
+        const strategyType = trafficStrategy.type;
+        const strategySelect = document.getElementById('strategy_type');
+        if (strategySelect) {
+            strategySelect.value = strategyType;
+            showStrategyConfig();
+            
+            // 根据策略类型设置具体值
+            switch (strategyType) {
+                case 'uniform':
+                    document.getElementById('uniform_device_count').value = trafficStrategy.device_count || 100;
+                    document.getElementById('uniform_qps').value = trafficStrategy.qps || 1000;
+                    break;
+                case 'poisson':
+                    // 清空现有配置
+                    const poissonContainer = document.getElementById('poisson_config_rows');
+                    poissonContainer.innerHTML = '';
+                    
+                    // 添加配置行
+                    if (trafficStrategy.config && Array.isArray(trafficStrategy.config)) {
+                        trafficStrategy.config.forEach((config, index) => {
+                            addPoissonRow();
+                            const rows = poissonContainer.querySelectorAll('.poisson-row');
+                            const lastRow = rows[rows.length - 1];
+                            lastRow.querySelector('.poisson-duration').value = config.duration || 3600;
+                            lastRow.querySelector('.poisson-device-count').value = config.device_count || 50;
+                        });
+                    }
+                    break;
+                case 'burst':
+                    document.getElementById('burst_device_count').value = trafficStrategy.device_count || 50;
+                    break;
+            }
+        }
+    }
+
+    // 加载OVSDB配置
+    function loadOVSDBConfig(ovsdbTables) {
+        if (!ovsdbTables) return;
+        
+        const dataRowsContainer = document.getElementById('ovsdb_data_rows');
+        dataRowsContainer.innerHTML = '';
+        
+        // 为每个表创建配置单元
+        Object.keys(ovsdbTables).forEach(tableName => {
+            const tableData = ovsdbTables[tableName];
+            if (tableData && tableData.data && Array.isArray(tableData.data)) {
+                // 为每个数据行创建配置单元
+                tableData.data.forEach((rowData, rowIndex) => {
+                    addOVSDBRow();
+                    const rows = dataRowsContainer.querySelectorAll('.ovsdb-row');
+                    const newRow = rows[rows.length - 1];
+                    
+                    // 设置表选择
+                    const tableSelect = newRow.querySelector('.ovsdb-table-select');
+                    tableSelect.value = tableName;
+                    updateRowColumns(tableSelect);
+                    
+                    // 设置列选择和数据
+                    setTimeout(() => {
+                        // 选择所有有数据的列
+                        const checkboxes = newRow.querySelectorAll('.column-checkbox');
+                        checkboxes.forEach(checkbox => {
+                            const columnName = checkbox.dataset.column;
+                            if (rowData.hasOwnProperty(columnName)) {
+                                checkbox.checked = true;
+                            }
+                        });
+                        
+                        updateRowData(newRow);
+                        
+                        // 设置数据值
+                        setTimeout(() => {
+                            console.log('开始填充数据到输入框:', rowData);
+                            Object.keys(rowData).forEach(columnName => {
+                                const value = rowData[columnName];
+                                console.log(`处理列 ${columnName}:`, value);
+                                
+                                // 查找对应的输入框容器
+                                const columnInputs = newRow.querySelectorAll('.ovsdb-column-input');
+                                let targetInput = null;
+                                
+                                columnInputs.forEach(columnInput => {
+                                    const label = columnInput.querySelector('.form-label');
+                                    if (label && label.textContent.includes(columnName)) {
+                                        targetInput = columnInput;
+                                        console.log(`找到列 ${columnName} 的输入框容器`);
+                                    }
+                                });
+                                
+                                if (targetInput) {
+                                    const input = targetInput.querySelector('input, .boolean-input-container');
+                                    if (input) {
+                                        const columnType = input.dataset.type;
+                                        console.log(`列 ${columnName} 的类型:`, columnType);
+                                        
+                                        if (columnType === 'boolean') {
+                                            // 处理布尔值
+                                            const radioToCheck = input.querySelector(`input[value="${value}"]`);
+                                            if (radioToCheck) {
+                                                radioToCheck.checked = true;
+                                                console.log(`设置布尔值 ${columnName} = ${value}`);
+                                            }
+                                        } else if (Array.isArray(value) && columnType && columnType.startsWith('map<')) {
+                                            // 处理map类型数组格式
+                                            const mapString = value.map(pair => `${pair[0]}:${pair[1]}`).join(',');
+                                            input.value = mapString;
+                                            console.log(`设置map值 ${columnName} = ${mapString}`);
+                                        } else if (Array.isArray(value) && columnType && columnType.startsWith('set<')) {
+                                            // 处理set类型数组格式
+                                            input.value = value.join(',');
+                                            console.log(`设置set值 ${columnName} = ${value.join(',')}`);
+                                        } else {
+                                            // 处理其他类型
+                                            input.value = value;
+                                            console.log(`设置普通值 ${columnName} = ${value}`);
+                                        }
+                                    } else {
+                                        console.log(`未找到列 ${columnName} 的输入框`);
+                                    }
+                                } else {
+                                    console.log(`未找到列 ${columnName} 的输入框容器`);
+                                }
+                            });
+                        }, 200);
+                    }, 100);
+                });
+            }
+        });
+    }
+
+    // 加载流表配置
+    function loadFlowTableConfig(flowTableConfig) {
+        if (!flowTableConfig) return;
+        
+        const flowTableType = flowTableConfig.type;
+        const flowTableSelect = document.getElementById('flow_table_type');
+        if (flowTableSelect) {
+            flowTableSelect.value = flowTableType;
+            showFlowTableConfig();
+            
+            if (flowTableConfig.data && Array.isArray(flowTableConfig.data)) {
+                // 清空现有配置
+                const container = document.getElementById(flowTableType + '_flow_rows');
+                container.innerHTML = '';
+                
+                // 添加流表规则
+                flowTableConfig.data.forEach((rule, index) => {
+                    addFlowRow(flowTableType);
+                    const rows = container.querySelectorAll('.flow-row');
+                    const lastRow = rows[rows.length - 1];
+                    const input = lastRow.querySelector(`.${flowTableType}-flow-rule`);
+                    if (input) {
+                        input.value = rule;
+                    }
+                });
+            }
+        }
+    }
 
     // 初始化OVSDB配置区域
     function initializeOVSDBConfig() {
@@ -1601,7 +1840,6 @@
             // 初始化表数据结构
             if (!result[selectedTable]) {
                 result[selectedTable] = {
-                    columns: columns,
                     data: []
                 };
             }
@@ -1635,7 +1873,7 @@
                     } else if (columnType && columnType.startsWith('set<')) {
                         value = value ? value.split(',').map(v => v.trim()) : [];
                     } else if (columnType && columnType.startsWith('map<')) {
-                        value = value ? parseMapValue(value) : {};
+                        value = value ? parseMapValue(value) : [];
                     }
                 }
 
@@ -1653,17 +1891,17 @@
 
     // 解析映射值
     function parseMapValue(mapString) {
-        const map = {};
-        if (!mapString) return map;
+        const mapArray = [];
+        if (!mapString) return mapArray;
 
         const pairs = mapString.split(',');
         pairs.forEach(pair => {
             const [key, value] = pair.split(':').map(s => s.trim());
             if (key && value !== undefined) {
-                map[key] = value;
+                mapArray.push([key, value]);
             }
         });
-        return map;
+        return mapArray;
     }
 
     // 获取流表配置
