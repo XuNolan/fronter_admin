@@ -1,0 +1,130 @@
+{
+  "type": "page",
+  "title": "执行组管理",
+  "body": [
+    {
+      "type": "alert",
+      "body": "执行组可以将多个脚本按顺序组织，实现批量自动化测试执行。",
+      "level": "info",
+      "showIcon": true,
+      "showCloseButton": false
+    },
+    {
+      "type": "crud",
+      "syncLocation": false,
+      "api": {
+        "method": "get",
+        "url": "http://127.0.0.1:8080/execute-group/list"
+      },
+      "perPageAvailable": [5, 10, 20, 50, 100],
+      "autoFillHeight": true,
+      "columns": [
+        {
+          "name": "id",
+          "label": "ID",
+          "type": "text",
+          "placeholder": "-"
+        },
+        {
+          "name": "groupName",
+          "label": "执行组名",
+          "type": "text",
+          "placeholder": "-"
+        },
+        {
+          "name": "scriptCount",
+          "label": "脚本数量",
+          "type": "text",
+          "placeholder": "-"
+        },
+        {
+          "name": "created",
+          "label": "创建时间",
+          "type": "date",
+          "format": "YYYY-MM-DD HH:mm:ss",
+          "valueFormat": "X",
+          "placeholder": "-"
+        },
+        {
+          "name": "updated",
+          "label": "更新时间",
+          "type": "date",
+          "format": "YYYY-MM-DD HH:mm:ss",
+          "valueFormat": "X",
+          "placeholder": "-"
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "buttons": [
+            {
+              "type": "button-group",
+              "buttons": [
+                {
+                  "type": "button",
+                  "label": "连续执行任务",
+                  "level": "success",
+                  "actionType": "ajax",
+                  "confirmText": "确认要顺序执行此组中的所有脚本吗？",
+                  "api": {
+                    "method": "post",
+                    "url": "http://127.0.0.1:8080/execute-group/execute/${id}"
+                  }
+                },
+                {
+                  "type": "button",
+                  "label": "组执行详情",
+                  "actionType": "link",
+                  "link": "/execute-group/detail/${id}"
+                },
+                {
+                  "type": "button",
+                  "label": "删除",
+                  "level": "danger",
+                  "actionType": "ajax",
+                  "confirmText": "删除执行组将删除所有关联的脚本配置，您确认要删除?",
+                  "api": {
+                    "method": "delete",
+                    "url": "http://127.0.0.1:8080/execute-group/delete/${id}"
+                  }
+                }
+              ]
+            }
+          ],
+          "placeholder": "-"
+        }
+      ],
+      "filter": {
+        "title": "",
+        "mode": "inline",
+        "wrapWithPanel": false,
+        "className": "m-b-sm",
+        "body": [
+          {
+            "type": "input-text",
+            "name": "keywords",
+            "placeholder": "执行组名关键字",
+            "addOn": {
+              "label": "搜索",
+              "type": "submit",
+              "className": "btn-success"
+            },
+            "clearable": true,
+            "size": "lg"
+          }
+        ]
+      },
+      "headerToolbar": [
+        {
+          "type": "button",
+          "label": "新增执行组",
+          "actionType": "link",
+          "level": "primary",
+          "icon": "fa fa-plus",
+          "link": "/execute-group/new"
+        }
+      ]
+    }
+  ]
+}
+

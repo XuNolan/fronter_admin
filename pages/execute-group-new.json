@@ -1,0 +1,135 @@
+{
+  "type": "page",
+  "title": "新增执行组",
+  "body": [
+    {
+      "type": "alert",
+      "body": "执行组将按照您设置的顺序依次执行脚本，请拖拽脚本卡片调整执行顺序。",
+      "level": "info",
+      "showIcon": true,
+      "showCloseButton": false
+    },
+    {
+      "type": "form",
+      "title": "执行组配置",
+      "mode": "normal",
+      "api": {
+        "method": "post",
+        "url": "http://127.0.0.1:8080/execute-group/create"
+      },
+      "redirect": "/execute-group/list",
+      "body": [
+        {
+          "type": "fieldset",
+          "title": "基本信息",
+          "collapsable": true,
+          "collapsed": false,
+          "body": [
+            {
+              "type": "input-text",
+              "name": "groupName",
+              "label": "执行组名",
+              "required": true,
+              "placeholder": "请输入执行组名称（不可重复）",
+              "maxLength": 32,
+              "showCounter": true,
+              "clearable": true,
+              "validations": {
+                "isLength": {
+                  "minimum": 1,
+                  "maximum": 32
+                }
+              },
+              "validationErrors": {
+                "isLength": "组名长度应在 1-32 个字符之间"
+              }
+            }
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "选择脚本（可拖拽排序）",
+          "collapsable": true,
+          "collapsed": false,
+          "body": [
+            {
+              "type": "combo",
+              "name": "scripts",
+              "label": "关联脚本",
+              "multiple": true,
+              "draggable": true,
+              "addable": true,
+              "removable": true,
+              "draggableTip": "可拖拽排序，拖拽后的顺序即为执行顺序",
+              "addButtonText": "添加脚本",
+              "minLength": 0,
+              "scaffold": {
+                "scriptId": null,
+                "scriptName": "",
+                "version": ""
+              },
+              "items": [
+                {
+                  "type": "select",
+                  "name": "scriptId",
+                  "label": "选择脚本",
+                  "required": true,
+                  "source": {
+                    "method": "get",
+                    "url": "http://127.0.0.1:8080/execute-group/available-scripts",
+                    "adaptor": "return payload.data;"
+                  },
+                  "labelField": "label",
+                  "valueField": "value",
+                  "searchable": true,
+                  "clearable": true,
+                  "placeholder": "请选择启用的脚本（格式：[用例名] 脚本名 (版本)）",
+                  "description": "仅显示已启用的脚本"
+                },
+                {
+                  "type": "group",
+                  "body": [
+                    {
+                      "type": "static",
+                      "label": "脚本信息",
+                      "tpl": "<div class='text-muted'><i class='fa fa-info-circle'></i> 选择后将按此顺序执行</div>"
+                    }
+                  ]
+                }
+              ],
+              "description": "拖拽上下箭头可调整执行顺序，第一个脚本将最先执行"
+            }
+          ]
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "static",
+          "label": "提示",
+          "tpl": "<div class='text-info'><i class='fa fa-info-circle'></i> 脚本将按照列表从上到下的顺序依次执行</div>"
+        }
+      ],
+      "actions": [
+        {
+          "type": "button",
+          "label": "返回列表",
+          "actionType": "link",
+          "link": "/execute-group/list"
+        },
+        {
+          "type": "reset",
+          "label": "重置"
+        },
+        {
+          "type": "submit",
+          "label": "创建执行组",
+          "level": "primary"
+        }
+      ],
+      "resetAfterSubmit": false,
+      "preventEnterSubmit": true
+    }
+  ]
+}
+

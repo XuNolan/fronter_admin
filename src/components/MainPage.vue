@@ -24,6 +24,12 @@ export default {
               "icon": "fa fa-cube",
               "children": [
                 {
+                  "label": "录制配置",
+                  "url": "/record/config",
+                  "icon": "fa fa-video-camera",
+                  "schemaApi": "get:/pages/record-config.json"
+                },
+                {
                   "label": "用例列表",
                   "url":"/usecase/list",
                   "icon": "fa fa-list",
@@ -41,10 +47,21 @@ export default {
                   "schemaApi": "get:/pages/usecase-info.json"
                 },
                 {
-                  "label": "录制配置",
-                  "url": "/record/config",
-                  "icon": "fa fa-video-camera",
-                  "schemaApi": "get:/pages/record-config.json"
+                  "label": "执行组列表",
+                  "url": "/execute-group/list",
+                  "icon": "fa fa-list",
+                  "schemaApi": "get:/pages/execute-group-list.json"
+                },
+                {
+                  "label": "新增执行组",
+                  "url": "/execute-group/new",
+                  "icon": "fa fa-plus",
+                  "schemaApi": "get:/pages/execute-group-new.json"
+                },
+                {
+                  "label": "执行组详情",
+                  "url": "/execute-group/detail/:id",
+                  "schemaApi": "get:/pages/execute-group-detail.json"
                 }
               ]
             }
