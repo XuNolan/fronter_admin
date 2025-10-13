@@ -127,7 +127,11 @@
                       "name": "groupName",
                       "label": "执行组名",
                       "required": true,
-                      "placeholder": "请输入执行组名称"
+                      "placeholder": "请输入执行组名称（不可重复）",
+                      "minLength": 1,
+                      "maxLength": 32,
+                      "showCounter": true,
+                      "clearable": true
                     },
                     {
                       "type": "combo",

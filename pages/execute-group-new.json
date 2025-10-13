@@ -31,18 +31,10 @@
               "label": "执行组名",
               "required": true,
               "placeholder": "请输入执行组名称（不可重复）",
+              "minLength": 1,
               "maxLength": 32,
               "showCounter": true,
-              "clearable": true,
-              "validations": {
-                "isLength": {
-                  "minimum": 1,
-                  "maximum": 32
-                }
-              },
-              "validationErrors": {
-                "isLength": "组名长度应在 1-32 个字符之间"
-              }
+              "clearable": true
             }
           ]
         },
@@ -73,7 +65,7 @@
                   "type": "select",
                   "name": "scriptId",
                   "label": "选择脚本",
-                  "required": true,
+                  "required": false,
                   "source": {
                     "method": "get",
                     "url": "http://127.0.0.1:8080/execute-group/available-scripts",
