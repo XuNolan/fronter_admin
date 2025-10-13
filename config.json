@@ -1,0 +1,104 @@
+{
+  "device_config": {
+    "sn_strategy": {
+      "type": "fixed",
+      "value": "092450775319979"
+    },
+    "fw_version": "V6F4.AA1.02",
+    "hw_version": "FX71m_V1",
+    "model": "FX71m",
+    "vendor": "FXZS",
+    "kit_version": "2.1.1",
+    "http_ip": "127.0.0.1",
+    "http_port": 8080,
+    "c_project_path": "../zagent_c"
+  },
+  "traffic_strategy": {
+    "type": "uniform",
+    "device_count": 1,
+    "qps": 50
+  },
+  "ovsdb_tables": {
+    "WANConnection": {
+      "data": [
+        {
+          "binding_port_name": "SDN-out-default",
+          "connection_status": [
+            ["dns6_ips", "192.168.1.1"],
+            ["prefix", "e80::/128"]
+          ]
+        }
+      ]
+    },
+    "Bridge": {
+      "data": [
+        {
+          "name": "SDN-bridge",
+          "datapath_version": "<unknown>",
+          "datapath_id": "00009ab305529b4d",
+          "ports": [
+            "8cbe4757-ae6e-45f5-a16e-080e12a95236"
+          ],
+          "controller": [
+            "34828853-1ca2-48e9-aaa9-aa6d874d0a9c"
+          ],
+          "protocols": [
+            "OpenFlow13"
+          ]
+        }
+      ]
+    },
+    "Port": {
+      "data": [
+        {
+          "name": "SDN-out-default",
+          "interfaces": [
+            "369626dd-e2fa-4105-b6ec-d8831a9748f2"
+          ]
+        }
+      ]
+    },
+    "Interface": {
+      "data": [
+        {
+          "name": "SDN-out-default",
+          "type": "internal",
+          "mac_in_use": "a2:93:7f:33:52:e0",
+          "ifindex": 3,
+          "ofport": 1,
+          "status": [
+            ["\"driver_name\"", "\"openvswitch\""]
+          ],
+          "admin_state": "down",
+          "link_state": "down",
+          "mtu": 1500
+        }
+      ]
+    },
+    "Open_vSwitch": {
+      "data": [
+        {
+          "datapaths": [
+            ["00009ab305529b4d", "8cbe4757-ae6e-45f5-a16e-080e12a95236"]
+          ]
+        }
+      ]
+    },
+    "Device": {
+      "data": [
+        {
+          "sn": "092450775319979",
+          "fw_version": "V6F4.AA1.02",
+          "hw_version": "FX71m_V1",
+          "model": "FX71m"
+        }
+      ]
+    }
+  },
+  "flow_table": {
+    "type": "string",
+    "data": [
+      "table=0,priority=100,in_port=1,actions=output:2"
+    ]
+  }
+}
