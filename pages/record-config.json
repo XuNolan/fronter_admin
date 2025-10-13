@@ -1,0 +1,110 @@
+{
+  "type": "page",
+  "title": "录制配置",
+  "body": [
+    {
+      "type": "form",
+      "title": "Monte 屏幕录制配置",
+      "api": {
+        "method": "post",
+        "url": "http://127.0.0.1:8080/record/config"
+      },
+      "initApi": {
+        "method": "get",
+        "url": "http://127.0.0.1:8080/record/config"
+      },
+      "controls": [
+        {
+          "type": "divider"
+        },
+        {
+          "type": "radios",
+          "name": "qualityPreset",
+          "label": "录制质量预设",
+          "options": [
+            { "label": "低", "value": "low" },
+            { "label": "中", "value": "medium" },
+            { "label": "高", "value": "high" }
+          ],
+          "value": "medium"
+        },
+        {
+          "type": "select",
+          "name": "format",
+          "label": "文件格式",
+          "options": [
+            { "label": "AVI", "value": "avi" },
+            { "label": "MP4", "value": "mp4" },
+            { "label": "WEBM", "value": "webm" }
+          ],
+          "value": "avi"
+        },
+        {
+          "type": "radios",
+          "name": "storage",
+          "label": "存储方式",
+          "options": [
+            { "label": "数据库存储", "value": "db" },
+            { "label": "后端本地存储", "value": "local" }
+          ],
+          "value": "db"
+        },
+        {
+          "type": "switch",
+          "name": "audio",
+          "label": "音频",
+          "value": false,
+          "onText": "开启",
+          "offText": "关闭"
+        },
+        {
+          "type": "select",
+          "name": "recordArea",
+          "label": "录制范围",
+          "options": [
+            { "label": "全屏幕", "value": "fullscreen" }
+          ],
+          "value": "fullscreen"
+        },
+        {
+          "name": "frameRate",
+          "type": "input-number",
+          "label": "自定义帧率（可选）",
+          "precision": 0,
+          "min": 5,
+          "max": 60,
+          "placeholder": "留空则按预设"
+        },
+        {
+          "name": "quality",
+          "type": "input-number",
+          "label": "自定义质量（0.1-1.0，可选）",
+          "precision": 1,
+          "min": 0.1,
+          "max": 1.0,
+          "step": 0.1,
+          "placeholder": "留空则按预设"
+        },
+        {
+          "type": "alert",
+          "level": "info",
+          "className": "m-t",
+          "body": "提示：目前后端 Monte 以 AVI 容器保存，选择 MP4/WEBM 仅做标记，后续可扩展编码器。"
+        }
+      ],
+      "actions": [
+        {
+          "type": "reset",
+          "label": "重置"
+        },
+        {
+          "type": "submit",
+          "label": "保存配置",
+          "level": "primary"
+        }
+      ]
+    }
+  ]
+}
+
+

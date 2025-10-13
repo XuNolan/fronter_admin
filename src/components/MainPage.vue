@@ -39,6 +39,12 @@ export default {
                   "label": "用例详情",
                   "url": "/usecase/query/:id",
                   "schemaApi": "get:/pages/usecase-info.json"
+                },
+                {
+                  "label": "录制配置",
+                  "url": "/record/config",
+                  "icon": "fa fa-video-camera",
+                  "schemaApi": "get:/pages/record-config.json"
                 }
               ]
             }
