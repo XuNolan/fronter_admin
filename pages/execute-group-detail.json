@@ -1,0 +1,160 @@
+{
+  "type": "page",
+  "title": "执行组详情",
+  "initApi": "http://127.0.0.1:8080/execute-group/detail/${id}",
+  "body": [
+    {
+      "type": "container",
+      "body": [
+        {
+          "type": "panel",
+          "title": "基本信息",
+          "body": [
+            {
+              "type": "form",
+              "mode": "horizontal",
+              "wrapWithPanel": false,
+              "api": {
+                "method": "post",
+                "url": "http://127.0.0.1:8080/execute-group/update/${id}"
+              },
+              "controls": [
+                {
+                  "type": "static",
+                  "name": "id",
+                  "label": "执行组ID"
+                },
+                {
+                  "type": "input-text",
+                  "name": "groupName",
+                  "label": "执行组名",
+                  "required": true
+                },
+                {
+                  "type": "static",
+                  "name": "created",
+                  "label": "创建时间",
+                  "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}"
+                },
+                {
+                  "type": "static",
+                  "name": "updated",
+                  "label": "更新时间",
+                  "tpl": "${updated | date:YYYY-MM-DD HH\\:mm\\:ss}"
+                }
+              ],
+              "actions": [
+                {
+                  "type": "button",
+                  "label": "返回列表",
+                  "actionType": "link",
+                  "link": "/execute-group/list"
+                },
+                {
+                  "type": "submit",
+                  "label": "保存基本信息",
+                  "level": "primary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "title": "关联脚本（按执行顺序）",
+          "className": "m-t",
+          "body": [
+            {
+              "type": "table",
+              "source": "${scripts}",
+              "columns": [
+                {
+                  "name": "index",
+                  "label": "执行顺序",
+                  "type": "text"
+                },
+                {
+                  "name": "scriptId",
+                  "label": "脚本ID",
+                  "type": "text"
+                },
+                {
+                  "name": "scriptName",
+                  "label": "脚本名",
+                  "type": "text"
+                },
+                {
+                  "name": "scriptDescription",
+                  "label": "脚本描述",
+                  "type": "text"
+                },
+                {
+                  "name": "version",
+                  "label": "版本",
+                  "type": "text"
+                }
+              ]
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "form",
+              "title": "修改脚本列表",
+              "mode": "normal",
+              "wrapWithPanel": false,
+              "api": {
+                "method": "post",
+                "url": "http://127.0.0.1:8080/execute-group/update/${id}",
+                "data": {
+                  "scriptIds": "${scriptIds}"
+                }
+              },
+              "controls": [
+                {
+                  "type": "input-array",
+                  "name": "scriptIds",
+                  "label": "脚本ID列表（按顺序）",
+                  "inline": true,
+                  "items": {
+                    "type": "input-number",
+                    "placeholder": "脚本ID",
+                    "required": true
+                  },
+                  "description": "请按执行顺序输入脚本ID，第一个输入的脚本将首先执行"
+                }
+              ],
+              "actions": [
+                {
+                  "type": "submit",
+                  "label": "更新脚本列表",
+                  "level": "primary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "title": "执行操作",
+          "className": "m-t",
+          "body": [
+            {
+              "type": "button",
+              "label": "连续执行此组所有脚本",
+              "level": "success",
+              "size": "lg",
+              "actionType": "ajax",
+              "confirmText": "确认要顺序执行此组中的所有脚本吗？执行可能需要较长时间。",
+              "api": {
+                "method": "post",
+                "url": "http://127.0.0.1:8080/execute-group/execute/${id}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
