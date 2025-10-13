@@ -1011,8 +1011,8 @@
             const keyType = getAtomicType(typeObj.key);
             const valueType = typeObj.value ? getAtomicType(typeObj.value) : null;
 
-            if (max === 1 && min === 1) {
-                // 标量类型
+            if (max === 1 && min <= 1) {
+                // 标量类型（包括可选标量 min=0, max=1）
                 return keyType;
             } else if (valueType === null) {
                 // set类型
