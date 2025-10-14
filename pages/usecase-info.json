@@ -3,677 +3,741 @@
   "title": "用例详情",
   "body": [
     {
-      "type": "service",
-      "body": [
-        {
-          "type": "fieldset",
-          "id": "u:1e904e53f6c3",
-          "title": "用例信息",
-          "collapsable": true,
-          "body": [
-            {
-              "type": "static",
-              "label": "用例名",
-              "name": "name",
-              "id": "u:1b8420420b1e",
-              "mode": "horizontal",
-              "labelAlign": "left",
-              "size": "sm"
-            },
-            {
-              "type": "static",
-              "label": "用例描述",
-              "name": "description",
-              "id": "u:df4123cb12e1",
-              "mode": "horizontal",
-              "labelAlign": "left"
-            },
-            {
-              "type": "static",
-              "label": "创建时间",
-              "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}",
-              "className": "mb-1"
-            },
-            {
-              "type": "static",
-              "label": "修改时间",
-              "tpl": "${updated | date:YYYY-MM-DD HH\\:mm\\:ss}",
-              "className": "mb-1"
-            },
-            {
-              "type": "button-group",
-              "id": "u:31ffca699d2d",
-              "buttons": [
-                {
-                  "type": "button",
-                  "label": "新增脚本",
-                  "id": "u:7a95c75101f8",
-                  "level": "primary",
-                  "themeCss": {
-                    "className": {
-                      "padding-and-margin:default": {
-                        "marginTop": "var(--sizes-size-6)",
-                        "marginRight": "var(--sizes-size-6)",
-                        "marginBottom": "var(--sizes-size-6)",
-                        "marginLeft": "var(--sizes-size-6)"
-                      }
-                    }
-                  },
-                  "onEvent": {
-                    "click": {
-                      "weight": 0,
-                      "actions": [
-                        {
-                          "ignoreError": false,
-                          "dialog": {
-                            "type": "dialog",
-                            "body": [
-                              {
-                                "type": "form",
-                                "id": "u:458aa437ac9b",
-                                "mode": "flex",
-                                "labelAlign": "top",
-                                "title": "表单",
-                                "dsType": "api",
-                                "feat": "Insert",
-                                "body": [
-                                  {
-                                    "type": "input-text",
-                                    "id": "u:698cbd6cc3ee",
-                                    "label": "脚本名",
-                                    "name": "newScriptName",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "required": true
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "用例脚本描述",
-                                    "name": "newScriptDescription",
-                                    "id": "u:1fd79c352a34",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": ""
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "版本号",
-                                    "name": "newScriptVersion",
-                                    "id": "u:09290fa6904e",
-                                    "required": true,
-                                    "validateOnChange": false,
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "labelRemark": {
-                                      "icon": "fa fa-question-circle",
-                                      "trigger": [
-                                        "hover"
-                                      ],
-                                      "className": "Remark--warning",
-                                      "placement": "top",
-                                      "title": "",
-                                      "content": "每个用例对应的脚本仅有唯一的版本号。"
-                                    }
-                                  },
-                                  {
-                                    "type": "editor",
-                                    "label": "脚本数据",
-                                    "name": "newScriptData",
-                                    "id": "u:bf567cc1e128",
-                                    "language": "plaintext",
-                                    "required": true
-                                  }
-                                ],
-                                "api": {
-                                  "url": "http://127.0.0.1:8080/script/new?usecaseId=${id}",
-                                  "method": "post",
-                                  "data": {
-                                    "usecaseId": "${id}",
-                                    "name": "${newScriptName}",
-                                    "version": "${newScriptVersion}",
-                                    "description": "${newScriptDescription}",
-                                    "data": "${newScriptData}"
-                                  }
-                                },
-                                "actions": [
-                                  {
-                                    "type": "button",
-                                    "label": "取消",
-                                    "onEvent": {
-                                      "click": {
-                                        "actions": [
-                                          {
-                                            "ignoreError": false,
-                                            "actionType": "closeDialog"
-                                          }
-                                        ]
-                                      }
-                                    },
-                                    "level": "primary",
-                                    "id": "u:3ce3b2380a95"
-                                  },
-                                  {
-                                    "type": "button",
-                                    "label": "提交",
-                                    "onEvent": {
-                                      "click": {
-                                        "actions": [
-                                          {
-                                            "actionType": "submit",
-                                            "componentId": "u:458aa437ac9b"
-                                          },
-                                          {
-                                            "ignoreError": false,
-                                            "actionType": "closeDialog"
-                                          }
-                                        ]
-                                      }
-                                    },
-                                    "level": "primary",
-                                    "id": "u:8d09f621a0be"
-                                  }
-                                ],
-                                "resetAfterSubmit": true,
-                                "preventEnterSubmit": true,
-                                "debug": false
-                              },
-                              {
-                                "type": "alert",
-                                "id": "u:fcaaea2a8953",
-                                "body": [
-                                  {
-                                    "type": "tpl",
-                                    "tpl": "提交之后默认不启用脚本。若需启用脚本，请在用例详情页确认启用。",
-                                    "wrapperComponent": "",
-                                    "inline": false,
-                                    "id": "u:4852a108b427"
-                                  }
-                                ],
-                                "level": "info"
-                              }
-                            ],
-                            "title": "新增用例",
-                            "id": "u:86e6adf68981",
-                            "asideResizor": false,
-                            "pullRefresh": {
-                              "disabled": true
-                            },
-                            "showCloseButton": true,
-                            "closeOnOutside": false,
-                            "closeOnEsc": false,
-                            "showErrorMsg": true,
-                            "showLoading": true,
-                            "draggable": false
-                          },
-                          "actionType": "dialog"
-                        }
-                      ]
-                    }
-                  },
-                  "api": "http://127.0.0.1:8080/"
-                },
-                {
-                  "type": "button",
-                  "label": "编辑",
-                  "onEvent": {
-                    "click": {
-                      "actions": [
-                        {
-                          "ignoreError": false,
-                          "actionType": "dialog",
-                          "dialog": {
-                            "type": "dialog",
-                            "title": "修改用例",
-                            "body": [
-                              {
-                                "type": "form",
-                                "id": "u:446a722254b7",
-                                "mode": "flex",
-                                "labelAlign": "top",
-                                "title": "表单",
-                                "dsType": "api",
-                                "feat": "Insert",
-                                "body": [
-                                  {
-                                    "type": "input-text",
-                                    "label": "用例名",
-                                    "name": "modifiedUsecaseName",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "id": "u:ac0b71081448",
-                                    "value": "${usecaseName}"
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "用例描述",
-                                    "name": "modifiedUsecaseDescription",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${usecaseDescription}",
-                                    "id": "u:8f1fb8a8d7bc"
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "创建时间",
-                                    "name": "created",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${created}",
-                                    "id": "u:8f1fb8a8d7bc",
-                                    "readOnly": true
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "修改时间",
-                                    "name": "updated",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${updated}",
-                                    "id": "u:8f1fb8a8d7bc",
-                                    "readOnly": true
-                                  }
-                                ],
-                                "api": {
-                                  "url": "http://127.0.0.1:8080/usecase/update/${id}",
-                                  "method": "post",
-                                  "data": {
-                                    "name": "${modifiedUsecaseName}",
-                                    "description": "${modifiedUsecaseDescription}"
-                                  }
-                                },
-                                "actions": [
-                                  {
-                                    "type": "button",
-                                    "label": "取消",
-                                    "onEvent": {
-                                      "click": {
-                                        "actions": [
-                                          {
-                                            "ignoreError": false,
-                                            "actionType": "closeDialog"
-                                          }
-                                        ]
-                                      }
-                                    },
-                                    "level": "primary"
-                                  },
-                                  {
-                                    "type": "button",
-                                    "label": "提交",
-                                    "onEvent": {
-                                      "click": {
-                                        "actions": [
-                                          {
-                                            "actionType": "submit"
-                                          },
-                                          {
-                                            "ignoreError": false,
-                                            "actionType": "closeDialog"
-                                          }
-                                        ]
-                                      }
-                                    },
-                                    "level": "primary"
-                                  }
-                                ],
-                                "resetAfterSubmit": true,
-                                "preventEnterSubmit": true,
-                                "debug": false,
-                                "initApi": {
-                                  "url": "http://127.0.0.1:8080/usecase/query/${id}",
-                                  "method": "get",
-                                  "responseData": {
-                                    "usecaseName": "${name}",
-                                    "usecaseDescription": "${description}"
-                                  }
-                                }
-                              }
-                            ],
-                            "id": "u:e544982789cb",
-                            "actions": [
-                              {
-                                "type": "button",
-                                "actionType": "cancel",
-                                "label": "取消",
-                                "id": "u:87cc235df9a2",
-                                "onEvent": {
-                                  "click": {
-                                    "weight": 0,
-                                    "actions": [
-                                      {
-                                        "ignoreError": false,
-                                        "actionType": "closeDialog"
-                                      }
-                                    ]
-                                  }
-                                }
-                              },
-                              {
-                                "type": "button",
-                                "actionType": "confirm",
-                                "label": "确定",
-                                "primary": true,
-                                "id": "u:7a56deb3ee2b"
-                              }
-                            ],
-                            "asideResizor": false,
-                            "pullRefresh": {
-                              "disabled": true
-                            },
-                            "showCloseButton": true,
-                            "closeOnOutside": false,
-                            "closeOnEsc": false,
-                            "showErrorMsg": true,
-                            "showLoading": true,
-                            "draggable": false,
-                            "actionType": "dialog"
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  "id": "u:9bc376403723",
-                  "level": "primary",
-                  "themeCss": {
-                    "className": {
-                      "padding-and-margin:default": {
-                        "marginTop": "var(--sizes-size-6)",
-                        "marginRight": "var(--sizes-size-6)",
-                        "marginBottom": "var(--sizes-size-6)",
-                        "marginLeft": "var(--sizes-size-6)"
-                      }
-                    }
-                  }
-                }
-              ],
-              "tiled": false,
-              "vertical": false
-            }
-          ]
-        },
+      "type": "grid",
+      "columns": [
         {
           "type": "service",
-          "id": "u:44dca40ea919",
-          "title": "脚本信息",
-          "collapsable": true,
           "body": [
             {
-              "type": "crud",
-              "id": "u:57b779f742d9",
-              "syncLocation": false,
-              "api": {
-                "method": "get",
-                "url": "http://127.0.0.1:8080/script/list?usecaseId=${id}&keyword=${keyword}"
-              },
-              "bulkActions": [],
-              "itemActions": [],
-              "columns": [
+              "type": "fieldset",
+              "id": "u:1e904e53f6c3",
+              "title": "用例信息",
+              "collapsable": true,
+              "mode": "horizontal",
+              "columnsCount": 2,
+              "columnRatio": 4,
+              "className": "mb-2",
+              "body": [
                 {
-                  "name": "scriptId",
-                  "label": "脚本id",
-                  "type": "text",
-                  "id": "u:bfb0a0898284",
-                  "placeholder": "-",
-                  "quickEdit": false,
-                  "visible": false
+                  "type": "static",
+                  "label": "用例名",
+                  "name": "name",
+                  "id": "u:1b8420420b1e",
+                  "mode": "horizontal",
+                  "labelAlign": "left",
+                  "size": "sm"
                 },
                 {
-                  "name": "scriptName",
-                  "label": "脚本名",
-                  "type": "text",
-                  "id": "u:5235bd553321",
-                  "placeholder": "-",
-                  "quickEdit": false
+                  "type": "static",
+                  "label": "用例描述",
+                  "name": "description",
+                  "id": "u:df4123cb12e1",
+                  "mode": "horizontal",
+                  "labelAlign": "left"
                 },
                 {
-                  "name": "version",
-                  "label": "版本号",
-                  "type": "text",
-                  "id": "u:45a69d781208",
-                  "placeholder": "-",
-                  "quickEdit": false
+                  "type": "static",
+                  "label": "创建时间",
+                  "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}",
+                  "className": "mb-1"
                 },
                 {
-                  "name": "isActive",
-                  "label": "是否启用",
-                  "type": "text",
-                  "id": "u:6558319861a1",
-                  "placeholder": "-",
-                  "quickEdit": false
+                  "type": "static",
+                  "label": "修改时间",
+                  "tpl": "${updated | date:YYYY-MM-DD HH\\:mm\\:ss}",
+                  "className": "mb-1"
                 },
                 {
-                  "type": "operation",
-                  "label": "操作",
+                  "type": "button-group",
+                  "id": "u:31ffca699d2d",
                   "buttons": [
                     {
-                      "type": "button-group",
-                      "buttons": [
-                        {
-                          "type": "button",
-                          "label": "查看详情",
-                          "id": "u:1f56a9e74711",
-                          "onEvent": {
-                            "click": {
-                              "weight": 0,
-                              "actions": [
-                                {
-                                  "componentId": "u:080610347bde",
-                                  "ignoreError": false,
-                                  "actionType": "setValue",
-                                  "args": {
-                                    "value": {
-                                      "scriptId": "${scriptId}"
+                      "type": "button",
+                      "label": "新增脚本",
+                      "id": "u:7a95c75101f8",
+                      "level": "primary",
+                      "themeCss": {
+                        "className": {
+                          "padding-and-margin:default": {
+                            "marginTop": "var(--sizes-size-6)",
+                            "marginRight": "var(--sizes-size-6)",
+                            "marginBottom": "var(--sizes-size-6)",
+                            "marginLeft": "var(--sizes-size-6)"
+                          }
+                        }
+                      },
+                      "onEvent": {
+                        "click": {
+                          "weight": 0,
+                          "actions": [
+                            {
+                              "ignoreError": false,
+                              "dialog": {
+                                "type": "dialog",
+                                "body": [
+                                  {
+                                    "type": "form",
+                                    "id": "u:458aa437ac9b",
+                                    "mode": "flex",
+                                    "labelAlign": "top",
+                                    "title": "表单",
+                                    "dsType": "api",
+                                    "feat": "Insert",
+                                    "body": [
+                                      {
+                                        "type": "input-text",
+                                        "id": "u:698cbd6cc3ee",
+                                        "label": "脚本名",
+                                        "name": "newScriptName",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "required": true
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "用例脚本描述",
+                                        "name": "newScriptDescription",
+                                        "id": "u:1fd79c352a34",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": ""
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "版本号",
+                                        "name": "newScriptVersion",
+                                        "id": "u:09290fa6904e",
+                                        "required": true,
+                                        "validateOnChange": false,
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "labelRemark": {
+                                          "icon": "fa fa-question-circle",
+                                          "trigger": [
+                                            "hover"
+                                          ],
+                                          "className": "Remark--warning",
+                                          "placement": "top",
+                                          "title": "",
+                                          "content": "每个用例对应的脚本仅有唯一的版本号。"
+                                        }
+                                      },
+                                      {
+                                        "type": "editor",
+                                        "label": "脚本数据",
+                                        "name": "newScriptData",
+                                        "id": "u:bf567cc1e128",
+                                        "language": "plaintext",
+                                        "required": true
+                                      }
+                                    ],
+                                    "api": {
+                                      "url": "http://127.0.0.1:8080/script/new?usecaseId=${id}",
+                                      "method": "post",
+                                      "data": {
+                                        "usecaseId": "${id}",
+                                        "name": "${newScriptName}",
+                                        "version": "${newScriptVersion}",
+                                        "description": "${newScriptDescription}",
+                                        "data": "${newScriptData}"
+                                      }
+                                    },
+                                    "actions": [
+                                      {
+                                        "type": "button",
+                                        "label": "取消",
+                                        "onEvent": {
+                                          "click": {
+                                            "actions": [
+                                              {
+                                                "ignoreError": false,
+                                                "actionType": "closeDialog"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "level": "primary",
+                                        "id": "u:3ce3b2380a95"
+                                      },
+                                      {
+                                        "type": "button",
+                                        "label": "提交",
+                                        "onEvent": {
+                                          "click": {
+                                            "actions": [
+                                              {
+                                                "actionType": "submit",
+                                                "componentId": "u:458aa437ac9b"
+                                              },
+                                              {
+                                                "ignoreError": false,
+                                                "actionType": "closeDialog"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "level": "primary",
+                                        "id": "u:8d09f621a0be"
+                                      }
+                                    ],
+                                    "resetAfterSubmit": true,
+                                    "preventEnterSubmit": true,
+                                    "debug": false
+                                  },
+                                  {
+                                    "type": "alert",
+                                    "id": "u:fcaaea2a8953",
+                                    "body": [
+                                      {
+                                        "type": "tpl",
+                                        "tpl": "提交之后默认不启用脚本。若需启用脚本，请在用例详情页确认启用。",
+                                        "wrapperComponent": "",
+                                        "inline": false,
+                                        "id": "u:4852a108b427"
+                                      }
+                                    ],
+                                    "level": "info"
+                                  }
+                                ],
+                                "title": "新增用例",
+                                "id": "u:86e6adf68981",
+                                "asideResizor": false,
+                                "pullRefresh": {
+                                  "disabled": true
+                                },
+                                "showCloseButton": true,
+                                "closeOnOutside": false,
+                                "closeOnEsc": false,
+                                "showErrorMsg": true,
+                                "showLoading": true,
+                                "draggable": false
+                              },
+                              "actionType": "dialog"
+                            }
+                          ]
+                        }
+                      },
+                      "api": "http://127.0.0.1:8080/"
+                    },
+                    {
+                      "type": "button",
+                      "label": "编辑",
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            {
+                              "ignoreError": false,
+                              "actionType": "dialog",
+                              "dialog": {
+                                "type": "dialog",
+                                "title": "修改用例",
+                                "body": [
+                                  {
+                                    "type": "form",
+                                    "id": "u:446a722254b7",
+                                    "mode": "flex",
+                                    "labelAlign": "top",
+                                    "title": "表单",
+                                    "dsType": "api",
+                                    "feat": "Insert",
+                                    "body": [
+                                      {
+                                        "type": "input-text",
+                                        "label": "用例名",
+                                        "name": "modifiedUsecaseName",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "id": "u:ac0b71081448",
+                                        "value": "${usecaseName}"
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "用例描述",
+                                        "name": "modifiedUsecaseDescription",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${usecaseDescription}",
+                                        "id": "u:8f1fb8a8d7bc"
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "创建时间",
+                                        "name": "created",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${created}",
+                                        "id": "u:8f1fb8a8d7bc",
+                                        "readOnly": true
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "修改时间",
+                                        "name": "updated",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${updated}",
+                                        "id": "u:8f1fb8a8d7bc",
+                                        "readOnly": true
+                                      }
+                                    ],
+                                    "api": {
+                                      "url": "http://127.0.0.1:8080/usecase/update/${id}",
+                                      "method": "post",
+                                      "data": {
+                                        "name": "${modifiedUsecaseName}",
+                                        "description": "${modifiedUsecaseDescription}"
+                                      }
+                                    },
+                                    "actions": [
+                                      {
+                                        "type": "button",
+                                        "label": "取消",
+                                        "onEvent": {
+                                          "click": {
+                                            "actions": [
+                                              {
+                                                "ignoreError": false,
+                                                "actionType": "closeDialog"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "level": "primary"
+                                      },
+                                      {
+                                        "type": "button",
+                                        "label": "提交",
+                                        "onEvent": {
+                                          "click": {
+                                            "actions": [
+                                              {
+                                                "actionType": "submit"
+                                              },
+                                              {
+                                                "ignoreError": false,
+                                                "actionType": "closeDialog"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "level": "primary"
+                                      }
+                                    ],
+                                    "resetAfterSubmit": true,
+                                    "preventEnterSubmit": true,
+                                    "debug": false,
+                                    "initApi": {
+                                      "url": "http://127.0.0.1:8080/usecase/query/${id}",
+                                      "method": "get",
+                                      "responseData": {
+                                        "usecaseName": "${name}",
+                                        "usecaseDescription": "${description}"
+                                      }
                                     }
                                   }
-                                }
-                              ]
+                                ],
+                                "id": "u:e544982789cb",
+                                "actions": [
+                                  {
+                                    "type": "button",
+                                    "actionType": "cancel",
+                                    "label": "取消",
+                                    "id": "u:87cc235df9a2",
+                                    "onEvent": {
+                                      "click": {
+                                        "weight": 0,
+                                        "actions": [
+                                          {
+                                            "ignoreError": false,
+                                            "actionType": "closeDialog"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "button",
+                                    "actionType": "confirm",
+                                    "label": "确定",
+                                    "primary": true,
+                                    "id": "u:7a56deb3ee2b"
+                                  }
+                                ],
+                                "asideResizor": false,
+                                "pullRefresh": {
+                                  "disabled": true
+                                },
+                                "showCloseButton": true,
+                                "closeOnOutside": false,
+                                "closeOnEsc": false,
+                                "showErrorMsg": true,
+                                "showLoading": true,
+                                "draggable": false,
+                                "actionType": "dialog"
+                              }
                             }
-                          }
-                        },
-                        {
-                          "type": "button",
-                          "label": "删除",
-                          "level": "danger",
-                          "actionType": "ajax",
-                          "confirmText": "您确认要删除此脚本?",
-                          "api": "delete:http://localhost:8080/script/delete?scriptId=${scriptId}"
+                          ]
                         }
-                      ],
-                      "id": "u:0b50227ae35b"
+                      },
+                      "id": "u:9bc376403723",
+                      "level": "primary",
+                      "themeCss": {
+                        "className": {
+                          "padding-and-margin:default": {
+                            "marginTop": "var(--sizes-size-6)",
+                            "marginRight": "var(--sizes-size-6)",
+                            "marginBottom": "var(--sizes-size-6)",
+                            "marginLeft": "var(--sizes-size-6)"
+                          }
+                        }
+                      }
                     }
                   ],
-                  "id": "u:5fa74ab5f0d5",
-                  "placeholder": "-"
+                  "tiled": false,
+                  "vertical": false
                 }
-              ],
-              "perPageAvailable": [
-                5,
-                10,
-                20,
-                50,
-                100
-              ],
-              "messages": {},
-              "initFetch": "",
-              "filter": {
-                "title": "查询条件",
-                "body": [
-                  {
-                    "type": "input-text",
-                    "name": "keyword",
-                    "label": "脚本名",
-                    "id": "u:cb1faa247032"
-                  },
-                  {
-                    "type": "submit",
-                    "label": "搜索",
-                    "primary": true,
-                    "id": "u:955634ef16bc"
-                  }
-                ],
-                "id": "u:4ad29892f6b0",
-                "feat": "Insert",
-                "labelAlign": "left",
-                "visible": true
-              },
-              "initFetchOn": "id!=null"
+              ]
             },
             {
               "type": "service",
-              "id": "u:080610347bde",
+              "id": "u:44dca40ea919",
+              "title": "脚本信息",
+              "collapsable": true,
+              "className": "mt-2",
               "body": [
                 {
-                  "type": "input-text",
-                  "label": "脚本id",
-                  "name": "scriptId",
-                  "id": "u:b106781f4f12",
-                  "mode": "horizontal",
-                  "labelAlign": "left",
-                  "hidden": true
-                },
-                {
-                  "type": "input-text",
-                  "label": "脚本名",
-                  "name": "script_name",
-                  "id": "u:f69d3e36552c",
-                  "mode": "horizontal",
-                  "labelAlign": "left"
-                },
-                {
-                  "type": "input-text",
-                  "label": "版本",
-                  "name": "script_version",
-                  "id": "u:c9fbf64b44b4",
-                  "mode": "horizontal",
-                  "labelAlign": "left"
-                },
-                {
-                  "type": "input-text",
-                  "label": "脚本描述",
-                  "name": "script_description",
-                  "id": "u:f040cea00a37",
-                  "mode": "horizontal",
-                  "labelAlign": "left"
-                },
-                {
-                  "type": "input-text",
-                  "label": "脚本创建时间",
-                  "name": "script_created",
-                  "id": "u:6eac7a88b7fd",
-                  "mode": "horizontal",
-                  "labelAlign": "left"
-                },
-                {
-                  "type": "input-text",
-                  "label": "脚本修改时间",
-                  "name": "script_updated",
-                  "id": "u:45997a6555d7",
-                  "mode": "horizontal",
-                  "labelAlign": "left"
-                },
-                {
-                  "type": "code",
-                  "label": "脚本代码内容",
-                  "name": "script_data",
-                  "id": "u:4714e0e20bf4",
-                  "language": "javascript"
-                },
-                {
-                  "type": "button",
-                  "label": "编辑",
-                  "onEvent": {
-                    "click": {
-                      "actions": [
+                  "type": "crud",
+                  "id": "u:57b779f742d9",
+                  "syncLocation": false,
+                  "api": {
+                    "method": "get",
+                    "url": "http://127.0.0.1:8080/script/list?usecaseId=${id}&keyword=${keyword}"
+                  },
+                  "bulkActions": [],
+                  "itemActions": [],
+                  "columns": [
+                    {
+                      "name": "scriptId",
+                      "label": "脚本id",
+                      "type": "text",
+                      "id": "u:bfb0a0898284",
+                      "placeholder": "-",
+                      "quickEdit": false,
+                      "visible": false
+                    },
+                    {
+                      "name": "scriptName",
+                      "label": "脚本名",
+                      "type": "text",
+                      "id": "u:5235bd553321",
+                      "placeholder": "-",
+                      "quickEdit": false
+                    },
+                    {
+                      "name": "version",
+                      "label": "版本号",
+                      "type": "text",
+                      "id": "u:45a69d781208",
+                      "placeholder": "-",
+                      "quickEdit": false
+                    },
+                    {
+                      "name": "isActive",
+                      "label": "是否启用",
+                      "type": "text",
+                      "id": "u:6558319861a1",
+                      "placeholder": "-",
+                      "quickEdit": false
+                    },
+                    {
+                      "type": "operation",
+                      "label": "操作",
+                      "buttons": [
                         {
-                          "ignoreError": false,
-                          "actionType": "dialog",
-                          "dialog": {
-                            "type": "dialog",
-                            "title": "修改脚本",
-                            "size": "full",
-                            "body": [
-                              {
-                                "type": "form",
-                                "id": "u:446a722254b7",
-                                "mode": "flex",
-                                "labelAlign": "top",
-                                "title": "表单",
-                                "dsType": "api",
-                                "feat": "Insert",
+                          "type": "button-group",
+                          "buttons": [
+                            {
+                              "type": "button",
+                              "label": "查看详情",
+                              "id": "u:1f56a9e74711",
+                              "onEvent": {
+                                "click": {
+                                  "weight": 0,
+                                  "actions": [
+                                    {
+                                      "componentId": "u:080610347bde",
+                                      "ignoreError": false,
+                                      "actionType": "setValue",
+                                      "args": {
+                                        "value": {
+                                          "scriptId": "${scriptId}"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "type": "button",
+                              "label": "删除",
+                              "level": "danger",
+                              "actionType": "ajax",
+                              "confirmText": "您确认要删除此脚本?",
+                              "api": "delete:http://localhost:8080/script/delete?scriptId=${scriptId}"
+                            }
+                          ],
+                          "id": "u:0b50227ae35b"
+                        }
+                      ],
+                      "id": "u:5fa74ab5f0d5",
+                      "placeholder": "-"
+                    }
+                  ],
+                  "perPageAvailable": [
+                    5,
+                    10,
+                    20,
+                    50,
+                    100
+                  ],
+                  "messages": {},
+                  "initFetch": "",
+                  "filter": {
+                    "title": "查询条件",
+                    "body": [
+                      {
+                        "type": "input-text",
+                        "name": "keyword",
+                        "label": "脚本名",
+                        "id": "u:cb1faa247032"
+                      },
+                      {
+                        "type": "submit",
+                        "label": "搜索",
+                        "primary": true,
+                        "id": "u:955634ef16bc"
+                      }
+                    ],
+                    "id": "u:4ad29892f6b0",
+                    "feat": "Insert",
+                    "labelAlign": "left",
+                    "visible": true
+                  },
+                  "initFetchOn": "id!=null"
+                },
+                {
+                  "type": "service",
+                  "id": "u:080610347bde",
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "label": "脚本id",
+                      "name": "scriptId",
+                      "id": "u:b106781f4f12",
+                      "mode": "horizontal",
+                      "labelAlign": "left",
+                      "hidden": true
+                    },
+                    {
+                      "type": "input-text",
+                      "label": "脚本名",
+                      "name": "script_name",
+                      "id": "u:f69d3e36552c",
+                      "mode": "horizontal",
+                      "labelAlign": "left"
+                    },
+                    {
+                      "type": "input-text",
+                      "label": "版本",
+                      "name": "script_version",
+                      "id": "u:c9fbf64b44b4",
+                      "mode": "horizontal",
+                      "labelAlign": "left"
+                    },
+                    {
+                      "type": "input-text",
+                      "label": "脚本描述",
+                      "name": "script_description",
+                      "id": "u:f040cea00a37",
+                      "mode": "horizontal",
+                      "labelAlign": "left"
+                    },
+                    {
+                      "type": "input-text",
+                      "label": "脚本创建时间",
+                      "name": "script_created",
+                      "id": "u:6eac7a88b7fd",
+                      "mode": "horizontal",
+                      "labelAlign": "left"
+                    },
+                    {
+                      "type": "input-text",
+                      "label": "脚本修改时间",
+                      "name": "script_updated",
+                      "id": "u:45997a6555d7",
+                      "mode": "horizontal",
+                      "labelAlign": "left"
+                    },
+                    {
+                      "type": "code",
+                      "label": "脚本代码内容",
+                      "name": "script_data",
+                      "id": "u:4714e0e20bf4",
+                      "language": "javascript"
+                    },
+                    {
+                      "type": "button",
+                      "label": "编辑",
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            {
+                              "ignoreError": false,
+                              "actionType": "dialog",
+                              "dialog": {
+                                "type": "dialog",
+                                "title": "修改脚本",
+                                "size": "full",
                                 "body": [
                                   {
-                                    "type": "input-text",
-                                    "label": "脚本名",
-                                    "name": "modifiedScriptName",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${scriptName}",
-                                    "id": "u:74ab64f79815"
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "脚本版本",
-                                    "name": "modifiedScriptVersion",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${scriptVersion}",
-                                    "id": "u:ac0b71081448"
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "脚本描述",
-                                    "name": "modifiedScriptDescription",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${scriptDescription}",
-                                    "id": "u:11bd7f668c2d"
-                                  },
-                                  {
-                                    "type": "editor",
-                                    "label": "脚本代码内容",
-                                    "name": "modifiedScriptData",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${scriptData}",
-                                    "id": "u:b890c8fc3e10"
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "创建时间",
-                                    "name": "created",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${scriptCreated | date:YYYY-MM-DD HH\\:mm\\:ss}",
-                                    "readOnly": true,
-                                    "id": "u:08065f1f1064"
-                                  },
-                                  {
-                                    "type": "input-text",
-                                    "label": "修改时间",
-                                    "name": "updated",
-                                    "mode": "horizontal",
-                                    "labelAlign": "left",
-                                    "value": "${scriptUpdated | date:YYYY-MM-DD HH\\:mm\\:ss}",
-                                    "readOnly": true,
-                                    "id": "u:eb50e3fbfaea"
+                                    "type": "form",
+                                    "id": "u:446a722254b7",
+                                    "mode": "flex",
+                                    "labelAlign": "top",
+                                    "title": "表单",
+                                    "dsType": "api",
+                                    "feat": "Insert",
+                                    "body": [
+                                      {
+                                        "type": "input-text",
+                                        "label": "脚本名",
+                                        "name": "modifiedScriptName",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${scriptName}",
+                                        "id": "u:74ab64f79815"
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "脚本版本",
+                                        "name": "modifiedScriptVersion",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${scriptVersion}",
+                                        "id": "u:ac0b71081448"
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "脚本描述",
+                                        "name": "modifiedScriptDescription",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${scriptDescription}",
+                                        "id": "u:11bd7f668c2d"
+                                      },
+                                      {
+                                        "type": "editor",
+                                        "label": "脚本代码内容",
+                                        "name": "modifiedScriptData",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${scriptData}",
+                                        "id": "u:b890c8fc3e10"
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "创建时间",
+                                        "name": "created",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${scriptCreated | date:YYYY-MM-DD HH\\:mm\\:ss}",
+                                        "readOnly": true,
+                                        "id": "u:08065f1f1064"
+                                      },
+                                      {
+                                        "type": "input-text",
+                                        "label": "修改时间",
+                                        "name": "updated",
+                                        "mode": "horizontal",
+                                        "labelAlign": "left",
+                                        "value": "${scriptUpdated | date:YYYY-MM-DD HH\\:mm\\:ss}",
+                                        "readOnly": true,
+                                        "id": "u:eb50e3fbfaea"
+                                      }
+                                    ],
+                                    "api": {
+                                      "url": "http://127.0.0.1:8080/script/update/${scriptId}",
+                                      "method": "post",
+                                      "data": {
+                                        "name": "${modifiedScriptName}",
+                                        "version": "${modifiedScriptVersion}",
+                                        "description": "${modifiedScriptDescription}",
+                                        "data": "${modifiedScriptData}"
+                                      }
+                                    },
+                                    "actions": [
+                                      {
+                                        "type": "button",
+                                        "label": "取消",
+                                        "onEvent": {
+                                          "click": {
+                                            "actions": [
+                                              {
+                                                "ignoreError": false,
+                                                "actionType": "closeDialog"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "level": "primary"
+                                      },
+                                      {
+                                        "type": "button",
+                                        "label": "提交",
+                                        "onEvent": {
+                                          "click": {
+                                            "actions": [
+                                              {
+                                                "actionType": "submit"
+                                              },
+                                              {
+                                                "ignoreError": false,
+                                                "actionType": "closeDialog"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "level": "primary"
+                                      }
+                                    ],
+                                    "resetAfterSubmit": true,
+                                    "preventEnterSubmit": true,
+                                    "debug": false,
+                                    "initApi": {
+                                      "url": "http://127.0.0.1:8080/script/query/${scriptId}",
+                                      "method": "get",
+                                      "responseData": {
+                                        "scriptName": "${name}",
+                                        "scriptVersion": "${version}",
+                                        "scriptDescription": "${description}",
+                                        "scriptData": "${data}",
+                                        "scriptUpdated": "${updated}",
+                                        "scriptCreated": "${created}"
+                                      }
+                                    }
                                   }
                                 ],
-                                "api": {
-                                  "url": "http://127.0.0.1:8080/script/update/${scriptId}",
-                                  "method": "post",
-                                  "data": {
-                                    "name": "${modifiedScriptName}",
-                                    "version": "${modifiedScriptVersion}",
-                                    "description": "${modifiedScriptDescription}",
-                                    "data": "${modifiedScriptData}"
-                                  }
-                                },
+                                "id": "u:e544982789cb",
                                 "actions": [
                                   {
                                     "type": "button",
+                                    "actionType": "cancel",
                                     "label": "取消",
+                                    "id": "u:87cc235df9a2",
                                     "onEvent": {
                                       "click": {
+                                        "weight": 0,
                                         "actions": [
                                           {
                                             "ignoreError": false,
@@ -681,282 +745,231 @@
                                           }
                                         ]
                                       }
-                                    },
-                                    "level": "primary"
+                                    }
                                   },
                                   {
                                     "type": "button",
-                                    "label": "提交",
-                                    "onEvent": {
-                                      "click": {
-                                        "actions": [
-                                          {
-                                            "actionType": "submit"
-                                          },
-                                          {
-                                            "ignoreError": false,
-                                            "actionType": "closeDialog"
-                                          }
-                                        ]
-                                      }
-                                    },
-                                    "level": "primary"
+                                    "actionType": "confirm",
+                                    "label": "确定",
+                                    "primary": true,
+                                    "id": "u:7a56deb3ee2b"
                                   }
                                 ],
-                                "resetAfterSubmit": true,
-                                "preventEnterSubmit": true,
-                                "debug": false,
-                                "initApi": {
-                                  "url": "http://127.0.0.1:8080/script/query/${scriptId}",
-                                  "method": "get",
-                                  "responseData": {
-                                    "scriptName": "${name}",
-                                    "scriptVersion": "${version}",
-                                    "scriptDescription": "${description}",
-                                    "scriptData": "${data}",
-                                    "scriptUpdated": "${updated}",
-                                    "scriptCreated": "${created}"
-                                  }
-                                }
+                                "showCloseButton": true,
+                                "closeOnOutside": false,
+                                "closeOnEsc": false,
+                                "showErrorMsg": true,
+                                "showLoading": true,
+                                "draggable": false,
+                                "asideResizor": false,
+                                "pullRefresh": {
+                                  "disabled": true
+                                },
+                                "actionType": "dialog"
                               }
-                            ],
-                            "id": "u:e544982789cb",
-                            "actions": [
-                              {
-                                "type": "button",
-                                "actionType": "cancel",
-                                "label": "取消",
-                                "id": "u:87cc235df9a2",
-                                "onEvent": {
-                                  "click": {
-                                    "weight": 0,
-                                    "actions": [
-                                      {
-                                        "ignoreError": false,
-                                        "actionType": "closeDialog"
-                                      }
-                                    ]
-                                  }
-                                }
-                              },
-                              {
-                                "type": "button",
-                                "actionType": "confirm",
-                                "label": "确定",
-                                "primary": true,
-                                "id": "u:7a56deb3ee2b"
-                              }
-                            ],
-                            "showCloseButton": true,
-                            "closeOnOutside": false,
-                            "closeOnEsc": false,
-                            "showErrorMsg": true,
-                            "showLoading": true,
-                            "draggable": false,
-                            "asideResizor": false,
-                            "pullRefresh": {
-                              "disabled": true
-                            },
-                            "actionType": "dialog"
+                            }
+                          ]
+                        }
+                      },
+                      "level": "primary",
+                      "themeCss": {
+                        "className": {
+                          "padding-and-margin:default": {
+                            "paddingTop": "var(--sizes-size-6)",
+                            "paddingRight": "var(--sizes-size-6)",
+                            "paddingBottom": "var(--sizes-size-6)",
+                            "paddingLeft": "var(--sizes-size-6)",
+                            "marginTop": "var(--sizes-size-6)",
+                            "marginRight": "var(--sizes-size-6)",
+                            "marginBottom": "var(--sizes-size-6)",
+                            "marginLeft": "var(--sizes-size-6)"
                           }
                         }
-                      ]
-                    }
-                  },
-                  "level": "primary",
-                  "themeCss": {
-                    "className": {
-                      "padding-and-margin:default": {
-                        "paddingTop": "var(--sizes-size-6)",
-                        "paddingRight": "var(--sizes-size-6)",
-                        "paddingBottom": "var(--sizes-size-6)",
-                        "paddingLeft": "var(--sizes-size-6)",
-                        "marginTop": "var(--sizes-size-6)",
-                        "marginRight": "var(--sizes-size-6)",
-                        "marginBottom": "var(--sizes-size-6)",
-                        "marginLeft": "var(--sizes-size-6)"
+                      },
+                      "id": "u:8d1296c9bc2d"
+                    },
+                    {
+                      "type": "button",
+                      "label": "测试",
+                      "actionType": "dialog",
+                      "dialog": {
+                        "title": "选择执行参数",
+                        "size": "md",
+                        "body": [
+                          { "type": "switch", "name": "needRecorded", "label": "是否录制", "value": false }
+                        ],
+                        "themeCss": {
+                          "className": {
+                            "padding-and-margin:default": {
+                              "paddingTop": "var(--sizes-size-6)",
+                              "paddingRight": "var(--sizes-size-6)",
+                              "paddingBottom": "var(--sizes-size-6)",
+                              "paddingLeft": "var(--sizes-size-6)",
+                              "marginTop": "var(--sizes-size-6)",
+                              "marginRight": "var(--sizes-size-6)",
+                              "marginBottom": "var(--sizes-size-6)",
+                              "marginLeft": "var(--sizes-size-6)"
+                            }
+                          }
+                        },
+                        "actions": [
+                          {
+                            "type": "button",
+                            "label": "开始执行",
+                            "level": "primary",
+                            "actionType": "drawer",
+                            "drawer": {
+                              "title": "执行测试 - ${usecaseName}",
+                              "size": "md",
+                              "style": { "width": "33.33vw" },
+                              "body": {
+                                "type": "iframe",
+                                "src": "/pages/testPage.html?scriptId=${id}&needRecorded=${needRecorded|default:false}",
+                                "height": "80vh",
+                                "className": "border-0",
+                                "style": { "width": "100%" }
+                              }
+                            }
+                          }
+                        ]
                       }
-                    }
-                  },
-                  "id": "u:8d1296c9bc2d"
-                },
-                {
-                  "type": "button",
-                  "label": "测试",
-                  "actionType": "dialog",
-                  "dialog": {
-                    "title": "选择执行参数",
-                    "size": "md",
-                    "body": [
-                      { "type": "switch", "name": "needRecorded", "label": "是否录制", "value": false }
-                    ],
-                    "themeCss": {
-                      "className": {
-                        "padding-and-margin:default": {
-                          "paddingTop": "var(--sizes-size-6)",
-                          "paddingRight": "var(--sizes-size-6)",
-                          "paddingBottom": "var(--sizes-size-6)",
-                          "paddingLeft": "var(--sizes-size-6)",
-                          "marginTop": "var(--sizes-size-6)",
-                          "marginRight": "var(--sizes-size-6)",
-                          "marginBottom": "var(--sizes-size-6)",
-                          "marginLeft": "var(--sizes-size-6)"
+                    },
+                    {
+                      "type": "button",
+                      "label": "启用当前脚本",
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            {
+                              "ignoreError": false,
+                              "actionType": "ajax",
+                              "outputVar": "responseResult",
+                              "args": {
+                                "options": {},
+                                "api": {
+                                  "url": "http://127.0.0.1:8080/script/active?usecaseId=${id}&scriptId=${scriptId}",
+                                  "method": "get"
+                                }
+                              }
+                            },
+                            {
+                              "ignoreError": false,
+                              "actionType": "toast",
+                              "args": {
+                                "msgType": "info",
+                                "position": "top-right",
+                                "closeButton": true,
+                                "showIcon": true,
+                                "msg": "启用成功，当前用例${name}启用脚本名${script_name}",
+                                "className": "theme-toast-action-scope"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "id": "u:517bc5faf9f7",
+                      "level": "primary",
+                      "themeCss": {
+                        "className": {
+                          "padding-and-margin:default": {
+                            "marginTop": "var(--sizes-size-6)",
+                            "marginRight": "var(--sizes-size-6)",
+                            "marginBottom": "var(--sizes-size-6)",
+                            "marginLeft": "var(--sizes-size-6)",
+                            "paddingTop": "var(--sizes-size-6)",
+                            "paddingRight": "var(--sizes-size-6)",
+                            "paddingBottom": "var(--sizes-size-6)",
+                            "paddingLeft": "var(--sizes-size-6)"
+                          }
                         }
                       }
                     },
-                    "actions": [
-                      {
-                        "type": "button",
-                        "label": "开始执行",
-                        "level": "primary",
-                        "actionType": "drawer",
-                        "drawer": {
-                          "title": "执行测试 - ${usecaseName}",
-                          "size": "md",
-                          "style": { "width": "33.33vw" },
-                          "body": {
-                            "type": "iframe",
-                            "src": "/pages/testPage.html?scriptId=${id}&needRecorded=${needRecorded|default:false}",
-                            "height": "80vh",
-                            "className": "border-0",
-                            "style": { "width": "100%" }
-                          }
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  "type": "button",
-                  "label": "启用当前脚本",
-                  "onEvent": {
-                    "click": {
-                      "actions": [
-                        {
-                          "ignoreError": false,
-                          "actionType": "ajax",
-                          "outputVar": "responseResult",
-                          "args": {
-                            "options": {},
-                            "api": {
-                              "url": "http://127.0.0.1:8080/script/active?usecaseId=${id}&scriptId=${scriptId}",
-                              "method": "get"
-                            }
-                          }
-                        },
-                        {
-                          "ignoreError": false,
-                          "actionType": "toast",
-                          "args": {
-                            "msgType": "info",
-                            "position": "top-right",
-                            "closeButton": true,
-                            "showIcon": true,
-                            "msg": "启用成功，当前用例${name}启用脚本名${script_name}",
-                            "className": "theme-toast-action-scope"
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  "id": "u:517bc5faf9f7",
-                  "level": "primary",
-                  "themeCss": {
-                    "className": {
-                      "padding-and-margin:default": {
-                        "marginTop": "var(--sizes-size-6)",
-                        "marginRight": "var(--sizes-size-6)",
-                        "marginBottom": "var(--sizes-size-6)",
-                        "marginLeft": "var(--sizes-size-6)",
-                        "paddingTop": "var(--sizes-size-6)",
-                        "paddingRight": "var(--sizes-size-6)",
-                        "paddingBottom": "var(--sizes-size-6)",
-                        "paddingLeft": "var(--sizes-size-6)"
-                      }
-                    }
-                  }
-                },
-                {
-                  "type": "button",
-                  "label": "禁用当前脚本",
-                  "onEvent": {
-                    "click": {
-                      "actions": [
-                        {
-                          "ignoreError": false,
-                          "actionType": "ajax",
-                          "outputVar": "responseResult",
-                          "args": {
-                            "options": {},
-                            "api": {
-                              "url": "http://127.0.0.1:8080/script/deActive?scriptId=${scriptId}",
-                              "method": "get"
-                            }
-                          }
-                        },
-                        {
-                          "ignoreError": false,
-                          "actionType": "toast",
-                          "args": {
-                            "msgType": "info",
-                            "position": "top-right",
-                            "closeButton": true,
-                            "showIcon": true,
-                            "msg": "禁用成功",
-                            "className": "theme-toast-action-scope"
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  "id": "u:55d9a6d4924a",
-                  "level": "primary",
-                  "themeCss": {
-                    "className": {
-                      "padding-and-margin:default": {
-                        "marginTop": "var(--sizes-size-6)",
-                        "marginRight": "var(--sizes-size-6)",
-                        "marginBottom": "var(--sizes-size-6)",
-                        "marginLeft": "var(--sizes-size-6)",
-                        "paddingTop": "var(--sizes-size-6)",
-                        "paddingRight": "var(--sizes-size-6)",
-                        "paddingBottom": "var(--sizes-size-6)",
-                        "paddingLeft": "var(--sizes-size-6)"
-                      }
-                    }
-                  }
-                },
-                {
-                  "type": "alert",
-                  "body": [
                     {
-                      "type": "tpl",
-                      "tpl": "启用当前脚本后，执行用例将默认执行此脚本。原有脚本将被弃用。",
-                      "wrapperComponent": "",
-                      "inline": false,
-                      "id": "u:edf7320913df"
+                      "type": "button",
+                      "label": "禁用当前脚本",
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            {
+                              "ignoreError": false,
+                              "actionType": "ajax",
+                              "outputVar": "responseResult",
+                              "args": {
+                                "options": {},
+                                "api": {
+                                  "url": "http://127.0.0.1:8080/script/deActive?scriptId=${scriptId}",
+                                  "method": "get"
+                                }
+                              }
+                            },
+                            {
+                              "ignoreError": false,
+                              "actionType": "toast",
+                              "args": {
+                                "msgType": "info",
+                                "position": "top-right",
+                                "closeButton": true,
+                                "showIcon": true,
+                                "msg": "禁用成功",
+                                "className": "theme-toast-action-scope"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "id": "u:55d9a6d4924a",
+                      "level": "primary",
+                      "themeCss": {
+                        "className": {
+                          "padding-and-margin:default": {
+                            "marginTop": "var(--sizes-size-6)",
+                            "marginRight": "var(--sizes-size-6)",
+                            "marginBottom": "var(--sizes-size-6)",
+                            "marginLeft": "var(--sizes-size-6)",
+                            "paddingTop": "var(--sizes-size-6)",
+                            "paddingRight": "var(--sizes-size-6)",
+                            "paddingBottom": "var(--sizes-size-6)",
+                            "paddingLeft": "var(--sizes-size-6)"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "alert",
+                      "body": [
+                        {
+                          "type": "tpl",
+                          "tpl": "启用当前脚本后，执行用例将默认执行此脚本。原有脚本将被弃用。",
+                          "wrapperComponent": "",
+                          "inline": false,
+                          "id": "u:edf7320913df"
+                        }
+                      ],
+                      "level": "info",
+                      "id": "u:d725279c605c",
+                      "showIcon": true,
+                      "visible": true,
+                      "hidden": false
                     }
                   ],
-                  "level": "info",
-                  "id": "u:d725279c605c",
-                  "showIcon": true,
-                  "visible": true,
-                  "hidden": false
+                  "dsType": "api",
+                  "api": "http://127.0.0.1:8080/script/info/${scriptId}",
+                  "method": "get",
+                  "initFetchOn": "scriptId!=null"
                 }
               ],
-              "dsType": "api",
-              "api": "http://127.0.0.1:8080/script/info/${scriptId}",
-              "method": "get",
-              "initFetchOn": "scriptId!=null"
+              "dsType": "api"
             }
           ],
-          "dsType": "api"
+          "id": "u:4e56d7183a4f",
+          "dsType": "api",
+          "initFetchSchema": false,
+          "api": "http://127.0.0.1:8080/usecase/query/${params.id}"
+        },
+        {
+
         }
-      ],
-      "id": "u:4e56d7183a4f",
-      "dsType": "api",
-      "initFetchSchema": false,
-      "api": "http://127.0.0.1:8080/usecase/query/${params.id}"
+      ]
     }
   ],
   "id": "u:befc1f8cc421",
