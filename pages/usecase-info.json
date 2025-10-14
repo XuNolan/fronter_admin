@@ -643,7 +643,7 @@
                                     "name": "created",
                                     "mode": "horizontal",
                                     "labelAlign": "left",
-                                    "value": "${scriptCreated}",
+                                    "value": "${scriptCreated | date:YYYY-MM-DD HH\\:mm\\:ss}",
                                     "readOnly": true,
                                     "id": "u:08065f1f1064"
                                   },
@@ -653,7 +653,7 @@
                                     "name": "updated",
                                     "mode": "horizontal",
                                     "labelAlign": "left",
-                                    "value": "${scriptUpdated}",
+                                    "value": "${scriptUpdated | date:YYYY-MM-DD HH\\:mm\\:ss}",
                                     "readOnly": true,
                                     "id": "u:eb50e3fbfaea"
                                   }
@@ -783,26 +783,47 @@
                 {
                   "type": "button",
                   "label": "测试",
-                  "onEvent": {
-                    "click": {
-                      "actions": []
-                    }
-                  },
-                  "id": "u:99620a03dd6a",
-                  "level": "primary",
-                  "themeCss": {
-                    "className": {
-                      "padding-and-margin:default": {
-                        "paddingTop": "var(--sizes-size-6)",
-                        "paddingRight": "var(--sizes-size-6)",
-                        "paddingBottom": "var(--sizes-size-6)",
-                        "paddingLeft": "var(--sizes-size-6)",
-                        "marginTop": "var(--sizes-size-6)",
-                        "marginRight": "var(--sizes-size-6)",
-                        "marginBottom": "var(--sizes-size-6)",
-                        "marginLeft": "var(--sizes-size-6)"
+                  "actionType": "dialog",
+                  "dialog": {
+                    "title": "选择执行参数",
+                    "size": "md",
+                    "body": [
+                      { "type": "switch", "name": "needRecorded", "label": "是否录制", "value": false }
+                    ],
+                    "themeCss": {
+                      "className": {
+                        "padding-and-margin:default": {
+                          "paddingTop": "var(--sizes-size-6)",
+                          "paddingRight": "var(--sizes-size-6)",
+                          "paddingBottom": "var(--sizes-size-6)",
+                          "paddingLeft": "var(--sizes-size-6)",
+                          "marginTop": "var(--sizes-size-6)",
+                          "marginRight": "var(--sizes-size-6)",
+                          "marginBottom": "var(--sizes-size-6)",
+                          "marginLeft": "var(--sizes-size-6)"
+                        }
                       }
-                    }
+                    },
+                    "actions": [
+                      {
+                        "type": "button",
+                        "label": "开始执行",
+                        "level": "primary",
+                        "actionType": "drawer",
+                        "drawer": {
+                          "title": "执行测试 - ${usecaseName}",
+                          "size": "md",
+                          "style": { "width": "33.33vw" },
+                          "body": {
+                            "type": "iframe",
+                            "src": "/pages/testPage.html?scriptId=${id}&needRecorded=${needRecorded|default:false}",
+                            "height": "80vh",
+                            "className": "border-0",
+                            "style": { "width": "100%" }
+                          }
+                        }
+                      }
+                    ]
                   }
                 },
                 {
