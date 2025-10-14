@@ -12,7 +12,7 @@
           "collapsable": true,
           "body": [
             {
-              "type": "input-text",
+              "type": "static",
               "label": "用例名",
               "name": "name",
               "id": "u:1b8420420b1e",
@@ -21,7 +21,7 @@
               "size": "sm"
             },
             {
-              "type": "input-text",
+              "type": "static",
               "label": "用例描述",
               "name": "description",
               "id": "u:df4123cb12e1",
@@ -29,30 +29,16 @@
               "labelAlign": "left"
             },
             {
-              "type": "input-text",
+              "type": "static",
               "label": "创建时间",
-              "name": "created",
-              "id": "u:30e13e6cb305",
-              "size": "sm",
-              "mode": "horizontal",
-              "labelAlign": "left",
-              "themeCss": {
-                "labelClassName": {
-                  "font:default": {
-                    "lineHeight": "var(--fonts-lineHeight-1)"
-                  }
-                }
-              }
+              "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}",
+              "className": "mb-1"
             },
             {
-              "type": "input-text",
+              "type": "static",
               "label": "修改时间",
-              "name": "updated",
-              "id": "u:85e33276ab03",
-              "size": "sm",
-              "labelWidth": "var(--sizes-size-1)",
-              "mode": "horizontal",
-              "labelAlign": "right"
+              "tpl": "${updated | date:YYYY-MM-DD HH\\:mm\\:ss}",
+              "className": "mb-1"
             },
             {
               "type": "button-group",
@@ -586,7 +572,7 @@
                   "labelAlign": "left"
                 },
                 {
-                  "type": "editor",
+                  "type": "code",
                   "label": "脚本代码内容",
                   "name": "script_data",
                   "id": "u:4714e0e20bf4",
@@ -604,6 +590,7 @@
                           "dialog": {
                             "type": "dialog",
                             "title": "修改脚本",
+                            "size": "full",
                             "body": [
                               {
                                 "type": "form",
