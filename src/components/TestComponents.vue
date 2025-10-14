@@ -215,17 +215,20 @@ export default {
     getStepStatusClass(scenarioIndex, stepIndex) {
       const result = this.executeResults.get(`${scenarioIndex}-${stepIndex}`);
       if (!result || result === "") return 'pending';
-      if (result.error) return 'error';
+      if (result.status === 'failed' || result.error) return 'error';
+      if (result.status === 'aborted') return 'error';
       if (result.status === 'passed') return 'success';
-      if (result.endTime) return 'success';  // 有结束时间说明已完成
+      if (result.status === 'skipped') return 'pending';
       return 'running';
     },
     
     getStepStatusIcon(scenarioIndex, stepIndex) {
       const result = this.executeResults.get(`${scenarioIndex}-${stepIndex}`);
       if (!result || result === "") return '○'; // 待执行
-      if (result.error) return '✕'; // 错误
-      if (result.status === 'passed' || result.endTime) return '✓'; // 成功
+      if (result.status === 'failed' || result.error) return '✕'; // 失败
+      if (result.status === 'aborted') return '✕'; // 中止
+      if (result.status === 'passed') return '✓'; // 成功
+      if (result.status === 'skipped') return '○'; // 跳过
       return '▶'; // 执行中
     },
     

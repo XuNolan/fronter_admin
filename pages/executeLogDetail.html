@@ -104,8 +104,22 @@
           finally{ state.loading = false; }
         })();
 
-        function cls(s){ if(!s) return 'pending'; if(s.error) return 'error'; if(s.status==='passed' || s.endTime) return 'success'; return 'running'; }
-        function ico(s){ if(!s) return '○'; if(s.error) return '✕'; if(s.status==='passed' || s.endTime) return '✓'; return '▶'; }
+        function cls(s){ 
+          if(!s) return 'pending'; 
+          if(s.status === 'failed' || s.error) return 'error'; 
+          if(s.status === 'aborted') return 'error';
+          if(s.status === 'passed') return 'success'; 
+          if(s.status === 'skipped') return 'pending';
+          return 'running'; 
+        }
+        function ico(s){ 
+          if(!s) return '○'; 
+          if(s.status === 'failed' || s.error) return '✕'; 
+          if(s.status === 'aborted') return '✕';
+          if(s.status === 'passed') return '✓'; 
+          if(s.status === 'skipped') return '○';
+          return '▶'; 
+        }
         function fmtTime(ts){ if(!ts) return 'N/A'; const d=new Date(ts); return d.toLocaleTimeString('zh-CN',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit',fractionalSecondDigits:3}); }
         function fmtDate(ts){ if(!ts) return 'N/A'; const d=new Date(ts*1000); return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
         function fmtDur(nanos){ if(!nanos) return 'N/A'; const ms=nanos/1e6; if(ms<1000) return `${ms.toFixed(0)}ms`; const s=ms/1000; if(s<60) return `${s.toFixed(1)}s`; const m=Math.floor(s/60); return `${m}m ${(s%60).toFixed(0)}s`; }
