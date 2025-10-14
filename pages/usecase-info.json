@@ -397,7 +397,7 @@
               ]
             },
         {
-          "md": 5,
+          "md": 4,
           "type": "service",
           "body": [
             {
@@ -985,7 +985,7 @@
           "api": "http://127.0.0.1:8080/usecase/query/${params.id}"
         },
         {
-          "md": 5,
+          "md": 6,
           "type": "service",
           "id": "u:executeLogService",
           "title": "执行日志与录制记录",
@@ -1071,7 +1071,8 @@
                 {
                   "type": "operation",
                   "label": "操作",
-                  "width": 220,
+                  "remark": "提示：要么删除录制文件，要么全部删除",
+                  "width": 260,
                   "buttons": [
                     {
                       "type": "button",
@@ -1082,26 +1083,49 @@
                     },
                     {
                       "type": "button",
-                      "label": "删除",
+                      "label": "删除录制文件",
                       "level": "danger",
-                      "actionType": "dialog",
-                      "dialog": {
-                        "title": "删除确认",
-                        "body": {
-                          "type": "form",
-                          "body": [
-                            { "type": "checkbox", "name": "deleteLog", "label": "删除执行日志", "value": true },
-                            { "type": "checkbox", "name": "deleteRecord", "label": "删除录制文件(及关联)", "value": false }
-                          ],
-                          "api": {
-                            "method": "post",
-                            "url": "http://127.0.0.1:8080/execute-log/delete",
-                            "data": {
-                              "executeLogId": "${executeLogId}",
-                              "deleteLog": "${deleteLog|default:true}",
-                              "deleteRecord": "${deleteRecord|default:false}"
-                            }
-                          }
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            {
+                              "actionType": "ajax",
+                              "api": {
+                                "method": "post",
+                                "url": "http://127.0.0.1:8080/execute-log/delete",
+                                "data": {
+                                  "executeLogId": "${executeLogId}",
+                                  "deleteLog": false,
+                                  "deleteRecord": true
+                                }
+                              }
+                            },
+                            { "actionType": "reload", "target": "u:executeLogService" }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "label": "全部删除",
+                      "level": "danger",
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            {
+                              "actionType": "ajax",
+                              "api": {
+                                "method": "post",
+                                "url": "http://127.0.0.1:8080/execute-log/delete",
+                                "data": {
+                                  "executeLogId": "${executeLogId}",
+                                  "deleteLog": true,
+                                  "deleteRecord": true
+                                }
+                              }
+                            },
+                            { "actionType": "reload", "target": "u:executeLogService" }
+                          ]
                         }
                       }
                     }
