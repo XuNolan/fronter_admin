@@ -1011,21 +1011,22 @@
                   "width": 80
                 },
                 {
+                  "name": "created",
+                  "label": "操作时间",
+                  "type": "tpl",
+                  "tpl": "${created * 1000 | date:YYYY-MM-DD HH\\:mm\\:ss}",
+                  "width": 160
+                },
+                {
                   "name": "statusText",
                   "label": "执行状态",
                   "type": "mapping",
-                  "width": 100,
+                  "width": 85,
                   "map": {
                     "成功": "<span class='label label-success'>成功</span>",
                     "失败": "<span class='label label-danger'>失败</span>",
                     "中止/进行中": "<span class='label label-warning'>中止/进行中</span>"
                   }
-                },
-                {
-                  "name": "executeTime",
-                  "label": "执行时长(ms)",
-                  "type": "text",
-                  "width": 120
                 },
                 {
                   "name": "hasRecord",
@@ -1061,89 +1062,46 @@
                   "visibleOn": "${hasRecord}"
                 },
                 {
+                  "name": "executeGroupId",
+                  "label": "执行组id",
+                  "type": "tpl",
+                  "tpl": "${executeGroupId || '-'}",
+                  "width": 80
+                },
+                {
                   "type": "operation",
                   "label": "操作",
-                  "width": 150,
+                  "width": 220,
                   "buttons": [
                     {
                       "type": "button",
-                      "label": "查看日志",
+                      "label": "查看详情",
                       "level": "link",
-                      "actionType": "dialog",
-                      "dialog": {
-                        "title": "执行日志详情",
-                        "size": "lg",
-                        "body": {
-                          "type": "service",
-                          "api": "http://127.0.0.1:8080/execute-log/detail/${executeLogId}",
-                          "body": [
-                            {
-                              "type": "static",
-                              "label": "执行状态",
-                              "name": "statusText"
-                            },
-                            {
-                              "type": "static",
-                              "label": "执行时长",
-                              "tpl": "${executeTime} ms"
-                            },
-                            {
-                              "type": "divider"
-                            },
-                            {
-                              "type": "json",
-                              "label": "执行日志数据",
-                              "name": "logData",
-                              "levelExpand": 1
-                            }
-                          ]
-                        }
-                      }
+                      "actionType": "link",
+                      "link": "/execute-log/detail/${executeLogId}"
                     },
                     {
                       "type": "button",
-                      "label": "查看录制",
-                      "level": "link",
-                      "visibleOn": "${hasRecord}",
+                      "label": "删除",
+                      "level": "danger",
                       "actionType": "dialog",
                       "dialog": {
-                        "title": "录制记录详情",
-                        "size": "lg",
+                        "title": "删除确认",
                         "body": {
-                          "type": "service",
-                          "api": "http://127.0.0.1:8080/execute-log/record/${recordId}",
+                          "type": "form",
                           "body": [
-                            {
-                              "type": "static",
-                              "label": "录制状态",
-                              "name": "statusText"
-                            },
-                            {
-                              "type": "static",
-                              "label": "存储方式",
-                              "tpl": "${storageType === 'local' ? '本地文件' : '数据库'}"
-                            },
-                            {
-                              "type": "static",
-                              "label": "录制文件路径",
-                              "name": "recordUrl",
-                              "visibleOn": "${storageType === 'local'}"
-                            },
-                            {
-                              "type": "static",
-                              "label": "录制时长",
-                              "tpl": "${executeTime} ms"
-                            },
-                            {
-                              "type": "divider"
-                            },
-                            {
-                              "type": "json",
-                              "label": "元数据",
-                              "name": "metadata",
-                              "levelExpand": 1
+                            { "type": "checkbox", "name": "deleteLog", "label": "删除执行日志", "value": true },
+                            { "type": "checkbox", "name": "deleteRecord", "label": "删除录制文件(及关联)", "value": false }
+                          ],
+                          "api": {
+                            "method": "post",
+                            "url": "http://127.0.0.1:8080/execute-log/delete",
+                            "data": {
+                              "executeLogId": "${executeLogId}",
+                              "deleteLog": "${deleteLog|default:true}",
+                              "deleteRecord": "${deleteRecord|default:false}"
                             }
-                          ]
+                          }
                         }
                       }
                     }
