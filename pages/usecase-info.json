@@ -1085,49 +1085,35 @@
                       "type": "button",
                       "label": "删除录制文件",
                       "level": "danger",
-                      "onEvent": {
-                        "click": {
-                          "actions": [
-                            {
-                              "actionType": "ajax",
-                              "api": {
-                                "method": "post",
-                                "url": "http://127.0.0.1:8080/execute-log/delete",
-                                "data": {
-                                  "executeLogId": "${executeLogId}",
-                                  "deleteLog": false,
-                                  "deleteRecord": true
-                                }
-                              }
-                            },
-                            { "actionType": "reload", "target": "u:executeLogService" }
-                          ]
+                      "confirmText": "确认删除录制文件？",
+                      "actionType": "ajax",
+                      "api": {
+                        "url": "http://127.0.0.1:8080/execute-log/delete",
+                        "method": "post",
+                        "data": {
+                          "executeLogId": "${executeLogId}",
+                          "deleteLog": false,
+                          "deleteRecord": true
                         }
-                      }
+                      },
+                      "reload": "u:executeLogService"
                     },
                     {
                       "type": "button",
                       "label": "全部删除",
                       "level": "danger",
-                      "onEvent": {
-                        "click": {
-                          "actions": [
-                            {
-                              "actionType": "ajax",
-                              "api": {
-                                "method": "post",
-                                "url": "http://127.0.0.1:8080/execute-log/delete",
-                                "data": {
-                                  "executeLogId": "${executeLogId}",
-                                  "deleteLog": true,
-                                  "deleteRecord": true
-                                }
-                              }
-                            },
-                            { "actionType": "reload", "target": "u:executeLogService" }
-                          ]
+                      "confirmText": "确认删除日志和录制文件？",
+                      "actionType": "ajax",
+                      "api": {
+                        "url": "http://127.0.0.1:8080/execute-log/delete",
+                        "method": "post",
+                        "data": {
+                          "executeLogId": "${executeLogId}",
+                          "deleteLog": true,
+                          "deleteRecord": true
                         }
-                      }
+                      },
+                      "reload": "u:executeLogService"
                     }
                   ]
                 }
