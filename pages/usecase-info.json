@@ -1008,7 +1008,7 @@
                   "name": "executeLogId",
                   "label": "日志ID",
                   "type": "text",
-                  "width": 80
+                  "width": 50
                 },
                 {
                   "name": "created",
@@ -1062,11 +1062,11 @@
                   "visibleOn": "${hasRecord}"
                 },
                 {
-                  "name": "executeGroupId",
-                  "label": "执行组id",
+                  "name": "executeGroupName",
+                  "label": "执行组",
                   "type": "tpl",
-                  "tpl": "${executeGroupId || '-'}",
-                  "width": 80
+                  "tpl": "${executeGroupName || '-'}",
+                  "width": 120
                 },
                 {
                   "type": "operation",
