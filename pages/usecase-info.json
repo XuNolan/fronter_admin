@@ -468,13 +468,29 @@
                                   "actions": [
                                     {
                                       "componentId": "u:080610347bde",
-                                      "ignoreError": false,
                                       "actionType": "setValue",
                                       "args": {
                                         "value": {
                                           "scriptId": "${scriptId}"
                                         }
                                       }
+                                    },
+                                    {
+                                      "componentId": "u:080610347bde",
+                                      "actionType": "reload"
+                                    },
+                                    {
+                                      "componentId": "u:executeLogService",
+                                      "actionType": "setValue",
+                                      "args": {
+                                        "value": {
+                                          "scriptId": "${scriptId}"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "componentId": "u:executeLogService",
+                                      "actionType": "reload"
                                     }
                                   ]
                                 }
@@ -971,12 +987,14 @@
         {
           "md": 5,
           "type": "service",
+          "id": "u:executeLogService",
           "title": "执行日志与录制记录",
           "collapsable": true,
           "className": "mt-2",
           "body": [
             {
               "type": "crud",
+              "id": "u:executeLogCrud",
               "syncLocation": false,
               "api": {
                 "method": "get",
