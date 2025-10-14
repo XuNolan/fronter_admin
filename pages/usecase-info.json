@@ -6,16 +6,14 @@
       "type": "grid",
       "columns": [
         {
-          "type": "service",
-          "body": [
-            {
+          "md": 2,
               "type": "fieldset",
               "id": "u:1e904e53f6c3",
               "title": "用例信息",
               "collapsable": true,
               "mode": "horizontal",
               "columnsCount": 2,
-              "columnRatio": 4,
+              "columnRatio": 1,
               "className": "mb-2",
               "body": [
                 {
@@ -398,6 +396,10 @@
                 }
               ]
             },
+        {
+          "md": 5,
+          "type": "service",
+          "body": [
             {
               "type": "service",
               "id": "u:44dca40ea919",
@@ -967,7 +969,171 @@
           "api": "http://127.0.0.1:8080/usecase/query/${params.id}"
         },
         {
-
+          "md": 5,
+          "type": "service",
+          "title": "执行日志与录制记录",
+          "collapsable": true,
+          "className": "mt-2",
+          "body": [
+            {
+              "type": "crud",
+              "syncLocation": false,
+              "api": {
+                "method": "get",
+                "url": "http://127.0.0.1:8080/execute-log/list?scriptId=${scriptId}"
+              },
+              "initFetchOn": "scriptId!=null",
+              "perPageAvailable": [10, 20, 50],
+              "perPage": 10,
+              "columns": [
+                {
+                  "name": "executeLogId",
+                  "label": "日志ID",
+                  "type": "text",
+                  "width": 80
+                },
+                {
+                  "name": "statusText",
+                  "label": "执行状态",
+                  "type": "mapping",
+                  "width": 100,
+                  "map": {
+                    "成功": "<span class='label label-success'>成功</span>",
+                    "失败": "<span class='label label-danger'>失败</span>",
+                    "中止/进行中": "<span class='label label-warning'>中止/进行中</span>"
+                  }
+                },
+                {
+                  "name": "executeTime",
+                  "label": "执行时长(ms)",
+                  "type": "text",
+                  "width": 120
+                },
+                {
+                  "name": "hasRecord",
+                  "label": "录制状态",
+                  "type": "mapping",
+                  "width": 100,
+                  "map": {
+                    "true": "<span class='label label-info'>已录制</span>",
+                    "false": "<span class='label label-default'>未录制</span>"
+                  }
+                },
+                {
+                  "name": "recordStatusText",
+                  "label": "录制结果",
+                  "type": "mapping",
+                  "width": 100,
+                  "map": {
+                    "成功": "<span class='label label-success'>成功</span>",
+                    "失败": "<span class='label label-danger'>失败</span>",
+                    "中止/进行中": "<span class='label label-warning'>中止/进行中</span>"
+                  },
+                  "visibleOn": "${hasRecord}"
+                },
+                {
+                  "name": "recordStorageType",
+                  "label": "存储方式",
+                  "type": "mapping",
+                  "width": 100,
+                  "map": {
+                    "local": "本地文件",
+                    "db": "数据库"
+                  },
+                  "visibleOn": "${hasRecord}"
+                },
+                {
+                  "type": "operation",
+                  "label": "操作",
+                  "width": 150,
+                  "buttons": [
+                    {
+                      "type": "button",
+                      "label": "查看日志",
+                      "level": "link",
+                      "actionType": "dialog",
+                      "dialog": {
+                        "title": "执行日志详情",
+                        "size": "lg",
+                        "body": {
+                          "type": "service",
+                          "api": "http://127.0.0.1:8080/execute-log/detail/${executeLogId}",
+                          "body": [
+                            {
+                              "type": "static",
+                              "label": "执行状态",
+                              "name": "statusText"
+                            },
+                            {
+                              "type": "static",
+                              "label": "执行时长",
+                              "tpl": "${executeTime} ms"
+                            },
+                            {
+                              "type": "divider"
+                            },
+                            {
+                              "type": "json",
+                              "label": "执行日志数据",
+                              "name": "logData",
+                              "levelExpand": 1
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "label": "查看录制",
+                      "level": "link",
+                      "visibleOn": "${hasRecord}",
+                      "actionType": "dialog",
+                      "dialog": {
+                        "title": "录制记录详情",
+                        "size": "lg",
+                        "body": {
+                          "type": "service",
+                          "api": "http://127.0.0.1:8080/execute-log/record/${recordId}",
+                          "body": [
+                            {
+                              "type": "static",
+                              "label": "录制状态",
+                              "name": "statusText"
+                            },
+                            {
+                              "type": "static",
+                              "label": "存储方式",
+                              "tpl": "${storageType === 'local' ? '本地文件' : '数据库'}"
+                            },
+                            {
+                              "type": "static",
+                              "label": "录制文件路径",
+                              "name": "recordUrl",
+                              "visibleOn": "${storageType === 'local'}"
+                            },
+                            {
+                              "type": "static",
+                              "label": "录制时长",
+                              "tpl": "${executeTime} ms"
+                            },
+                            {
+                              "type": "divider"
+                            },
+                            {
+                              "type": "json",
+                              "label": "元数据",
+                              "name": "metadata",
+                              "levelExpand": 1
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
