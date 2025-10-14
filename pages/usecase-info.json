@@ -1012,9 +1012,9 @@
                 },
                 {
                   "name": "created",
-                  "label": "操作时间",
+                  "label": "测试时间",
                   "type": "tpl",
-                  "tpl": "${created * 1000 | date:YYYY-MM-DD HH\\:mm\\:ss}",
+                  "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}",
                   "width": 160
                 },
                 {
