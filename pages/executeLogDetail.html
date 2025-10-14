@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>执行日志详情</title>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .container { padding: 16px; }
+    .card { background: #fff; border-radius: 6px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .card h3 { margin: 0 0 10px; font-size: 16px; }
+    .info-row { margin-bottom: 8px; display: flex; gap: 8px; color: #333; }
+    .label { color: #666; width: 90px; flex-shrink: 0; }
+    pre { margin: 0; padding: 10px; background: #f8f9fa; border-radius: 4px; overflow-x: auto; }
+    .scenario { margin-bottom: 16px; }
+    .scenario h4 { margin: 0 0 8px; font-size: 15px; }
+    .step { background:#f8f9fa; border-radius:4px; padding:10px; margin-bottom:8px; }
+    .step.pending{ border-left:3px solid #6c757d; }
+    .step.running{ border-left:3px solid #007bff; background:#f0f7ff; }
+    .step.success{ border-left:3px solid #28a745; }
+    .step.error{ border-left:3px solid #dc3545; }
+    .step .head{ display:flex; align-items:center; gap:10px; }
+    .icon{ width:20px; text-align:center; }
+    .code{ font-family: Monaco, Consolas, "Courier New", monospace; font-size: 13px; white-space: pre-wrap; }
+    .timing{ display:flex; gap:12px; font-size:12px; color:#666; margin-top:6px; }
+    .err{ margin-top:8px; background:#fff5f5; color:#dc3545; padding:10px; border-radius:4px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp, reactive } = Vue;
+
+    function getQuery(name){
+      const p = new URLSearchParams(window.location.search); return p.get(name);
+    }
+
+    async function fetchLogDetail(id){
+      const url = `http://127.0.0.1:8080/execute-log/detail/${id}`;
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('fetch failed');
+      const json = await res.json();
+      // 处理 AmisResult 包装的响应
+      if (json.status === 0 && json.data) {
+        return json.data;
+      } else if (json.status === 0) {
+        return json;
+      } else {
+        throw new Error(json.msg || '获取日志详情失败');
+      }
+    }
+
+    // 兼容不同字段命名（如 _logData / logData）
+    function pick(data, ...keys){
+      for(const k of keys){ if(data && data[k] != null) return data[k]; }
+      return undefined;
+    }
+
+    const Detail = {
+      setup(){
+        const state = reactive({ base:{}, steps:[], loading:true, error:'', tick: 0 });
+        const id = getQuery('id');
+        (async ()=>{
+          try{
+            console.log('Fetching log detail for id:', id);
+            const data = await fetchLogDetail(id);
+            console.log('Received data:', data);
+            // 归一化常用字段，兼容 _ 前缀
+            state.base = {
+              id: pick(data, 'id', '_id'),
+              status: pick(data, 'status', '_status'),
+              statusText: pick(data, 'statusText', '_statusText'),
+              executeTime: pick(data, 'executeTime', '_executeTime'),
+              created: pick(data, 'created', '_created'),
+            };
+            // logData 为 JSON 数组字符串（afterStep 累计），每项包括 stepString 与 detail(ExecuteResultInfo)
+            const logDataStr = pick(data, 'logData', '_logData') || '[]';
+            console.log('Log data string:', logDataStr);
+            const arr = JSON.parse(logDataStr);
+            console.log('Parsed log data array:', arr);
+            state.steps = arr.map(item=>{
+              const d = item.detail || {};
+              return {
+                scenarioIndex: item.scenarioIndex,
+                stepIndex: item.stepIndex,
+                stepString: item.stepString,
+                status: d.status,
+                startTime: d.startTime,
+                endTime: d.endTime,
+                durationNanos: d.durationNanos,
+                error: d.error,
+                aborted: d.aborted,
+                raw: d
+              }
+            });
+            console.log('Processed steps:', state.steps);
+            // 强制触发一次更新
+            state.tick++;
+          }catch(e){ 
+            console.error('Error fetching log detail:', e);
+            state.error = e.message; 
+          }
+          finally{ state.loading = false; }
+        })();
+
+        function cls(s){ if(!s) return 'pending'; if(s.error) return 'error'; if(s.status==='passed' || s.endTime) return 'success'; return 'running'; }
+        function ico(s){ if(!s) return '○'; if(s.error) return '✕'; if(s.status==='passed' || s.endTime) return '✓'; return '▶'; }
+        function fmtTime(ts){ if(!ts) return 'N/A'; const d=new Date(ts); return d.toLocaleTimeString('zh-CN',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit',fractionalSecondDigits:3}); }
+        function fmtDate(ts){ if(!ts) return 'N/A'; const d=new Date(ts*1000); return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+        function fmtDur(nanos){ if(!nanos) return 'N/A'; const ms=nanos/1e6; if(ms<1000) return `${ms.toFixed(0)}ms`; const s=ms/1000; if(s<60) return `${s.toFixed(1)}s`; const m=Math.floor(s/60); return `${m}m ${(s%60).toFixed(0)}s`; }
+
+        return { state, cls, ico, fmtTime, fmtDate, fmtDur }
+      },
+      template: `
+        <div class="container">
+          <div class="card">
+            <h3>日志信息</h3>
+            <div class="info-row"><span class="label">日志ID</span><span>{{state.base.id || '-'}}</span></div>
+            <div class="info-row"><span class="label">执行状态</span><span>{{state.base.statusText || state.base.status}}</span></div>
+            <div class="info-row"><span class="label">执行时长</span><span>{{state.base.executeTime}} ms</span></div>
+            <div class="info-row"><span class="label">创建时间</span><span>{{fmtDate(state.base.created)}}</span></div>
+          </div>
+
+          <div class="card">
+            <h3>步骤详情</h3>
+            <div v-if="state.loading">加载中...</div>
+            <div v-else-if="state.error" class="err">错误: {{state.error}}</div>
+            <div v-else :key="state.tick">
+              <div v-if="state.steps.length === 0" class="info-row">暂无步骤数据</div>
+              <div v-else>
+                <div v-for="s in state.steps" :key="s.scenarioIndex+'-'+s.stepIndex" class="step" :class="cls(s)">
+                  <div class="head">
+                    <span class="icon">{{ ico(s) }}</span>
+                    <span class="code">{{ s.stepString }}</span>
+                  </div>
+                  <div class="timing">
+                    <span>开始: {{ fmtTime(s.startTime) }}</span>
+                    <span>结束: {{ fmtTime(s.endTime) }}</span>
+                    <span>耗时: {{ fmtDur(s.durationNanos) }}</span>
+                  </div>
+                  <pre v-if="s.error" class="err"><code>{{ s.error }}</code></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    createApp(Detail).mount('#app')
+  </script>
+</body>
+</html>
+

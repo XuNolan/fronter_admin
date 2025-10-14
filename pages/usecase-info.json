@@ -1079,7 +1079,7 @@
                       "label": "查看详情",
                       "level": "link",
                       "actionType": "link",
-                      "link": "/execute-log/detail/${executeLogId}"
+                      "link": "/pages/executeLogDetail.html?id=${executeLogId}"
                     },
                     {
                       "type": "button",
