@@ -95,6 +95,7 @@ import axios from 'axios';
 import {reactive} from "vue";
 
 let scriptIdFromUrl;
+let needRecordedFromUrl;
 
 let webSocket;
 
@@ -110,6 +111,7 @@ export default {
     });
 
     scriptIdFromUrl = getScriptId();
+    needRecordedFromUrl = getNeedRecorded();
     //请求并获取脚本基础信息
     if(scriptIdFromUrl!=null){
       try {
@@ -159,6 +161,7 @@ export default {
         msgType:"script_start",
         content:{
           "scriptId": getScriptId(),
+          "needRecorded": getNeedRecorded()
         }
       };
       webSocket.send(JSON.stringify(startFeatureRequest));
@@ -242,9 +245,15 @@ function getScriptId(){
   return scriptId[scriptId.length-1];
 }
 
+function getNeedRecorded(){
+  const urlParams = new URLSearchParams(window.location.search);
+  const needRecorded = urlParams.get('needRecorded');
+  return needRecorded === 'true';
+}
+
 async function fetchScriptBaseInfo(){
   let res;
-  await axios.get(`http://127.0.0.1:8080/script/testInfo?scriptId=${scriptIdFromUrl}`).then(
+  await axios.get(`http://127.0.0.1:8080/script/testInfo?scriptId=${scriptIdFromUrl}&needRecorded=${needRecordedFromUrl}`).then(
       r =>{ res = r }
   );
   return res.data;

@@ -32,13 +32,6 @@
                 "method": "get",
                 "url": "http://127.0.0.1:8080/usecase/list"
               },
-              "bulkActions": [
-                {
-                  "label": "批量执行",
-                  "type": "button",
-                  "id": "u:eda2dd41fd5e"
-                }
-              ],
               "itemActions": [],
               "id": "u:8a34c92f4ee9",
               "perPageAvailable": [
@@ -92,20 +85,6 @@
                   "id": "u:c86af15a9b80",
                   "placeholder": "-",
                   "label": "脚本版本"
-                },
-                {
-                  "type": "text",
-                  "label": "最后执行时间",
-                  "name": "lastExecuteTime",
-                  "id": "u:5b372b330fbb",
-                  "placeholder": "-"
-                },
-                {
-                  "type": "text",
-                  "label": "执行情况",
-                  "name": "status",
-                  "id": "u:1f541753b362",
-                  "placeholder": "-"
                 },
                 {
                   "type": "operation",
@@ -183,7 +162,7 @@
               },
               "headerToolbar": [
                 {
-                  "label": "新增",
+                  "label": "新增脚本",
                   "type": "button",
                   "actionType": "link",
                   "level": "primary",
