@@ -103,19 +103,36 @@
                         {
                           "type": "button",
                           "label": "测试",
-                          "id": "u:809d0104a090",
-                          "onEvent": {
-                            "click": {
-                              "weight": 0,
-                              "actions": [
-                                {
-                                  "ignoreError": false,
-                                  "script": "const newWindow = window.open('/pages/testPage.html?scriptId='+ context.props.data.id, '', 'width=800,height=600');\n\n// 在新窗口中动态设置大小\nnewWindow.resizeTo(2096, 768); // 将新窗口的尺寸调整为 1024x768",
-                                  "actionType": "custom",
-                                  "args": {}
+                          "actionType": "dialog",
+                          "dialog": {
+                            "title": "选择执行参数",
+                            "size": "md",
+                            "body": [
+                              { "type": "switch", "name": "needRecorded", "label": "是否录制", "value": false }
+                            ],
+                            "actions": [
+                              {
+                                "type": "button",
+                                "label": "开始执行",
+                                "level": "primary",
+                                "actionType": "drawer",
+                                "drawer": {
+                                  "title": "执行测试 - ${usecaseName}",
+                                  "size": "xl",
+                                  "body": {
+                                    "type": "iframe",
+                                    "src": "/pages/testPage.html?scriptId=${id}&needRecorded=${needRecorded|default:false}",
+                                    "height": "80vh",
+                                    "className": "border-0",
+                                    "style": {
+                                      "width": "33.33vw",
+                                      "marginLeft": "auto",
+                                      "display": "block"
+                                    }
+                                  }
                                 }
-                              ]
-                            }
+                              }
+                            ]
                           }
                         },
                         {

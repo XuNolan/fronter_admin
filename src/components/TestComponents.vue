@@ -233,16 +233,9 @@ export default {
 
 
 function getScriptId(){
-  const path = window.location.href;
-  const idNV = path.split('?');
-  if(idNV.length <= 1){
-    return null;
-  }
-  const scriptId = idNV[idNV.length-1].split('=')
-  if(scriptId.length <= 1){
-    return null;
-  }
-  return scriptId[scriptId.length-1];
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get('scriptId');
+  return id;
 }
 
 function getNeedRecorded(){
