@@ -205,6 +205,106 @@
           ]
         }
       ]
+    },
+    {
+      "type": "grid",
+      "columns": [
+        {
+          "type": "panel",
+          "title": "执行批次列表",
+          "md": 6,
+          "body": [
+            {
+              "type": "crud",
+              "id": "u:groupBatchCrud",
+              "syncLocation": false,
+              "api": {
+                "method": "get",
+                "url": "http://127.0.0.1:8080/execute-group/batches/${params.id}"
+              },
+              "columns": [
+                { "name": "executeTermId", "label": "执行批次UUID", "type": "tpl", "tpl": "${executeTermId}" },
+                { "name": "created", "label": "开始时间", "type": "tpl", "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}", "width": 160 },
+                { "name": "count", "label": "脚本数", "type": "text", "width": 70 },
+                {
+                  "type": "operation",
+                  "label": "操作",
+                  "width": 160,
+                  "buttons": [
+                    {
+                      "type": "button",
+                      "label": "查看详情",
+                      "level": "link",
+                      "onEvent": {
+                        "click": {
+                          "actions": [
+                            { "componentId": "u:groupBatchDetailService", "actionType": "setValue", "args": { "value": { "executeTermId": "${executeTermId}" } } },
+                            { "componentId": "u:groupBatchDetailService", "actionType": "reload" }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "label": "删除",
+                      "level": "danger",
+                      "confirmText": "确认删除该批次的所有关联记录？",
+                      "actionType": "ajax",
+                      "api": {
+                        "url": "http://127.0.0.1:8080/execute-group/batch/delete",
+                        "method": "post",
+                        "data": { "groupId": "${params.id}", "executeTermId": "${executeTermId}" }
+                      },
+                      "reload": "u:groupBatchCrud"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "title": "批次详情：日志与录制",
+          "md": 6,
+          "body": [
+            {
+              "type": "service",
+              "id": "u:groupBatchDetailService",
+              "api": {
+                "method": "get",
+                "url": "http://127.0.0.1:8080/execute-group/batch/detail?groupId=${params.id}&executeTermId=${executeTermId}"
+              },
+              "initFetch": false,
+              "initFetchOn": "executeTermId",
+              "body": [
+                {
+                  "type": "crud",
+                  "id": "u:groupBatchDetailCrud",
+                  "source": "${data.items}",
+                  "syncLocation": false,
+                  "columns": [
+                    { "name": "executeLogId", "label": "日志ID", "type": "text", "width": 70 },
+                    { "name": "created", "label": "测试时间", "type": "tpl", "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}", "width": 160 },
+                    { "name": "statusText", "label": "执行状态", "type": "mapping", "map": { "成功": "<span class='label label-success'>成功</span>", "失败": "<span class='label label-danger'>失败</span>", "中止/进行中": "<span class='label label-warning'>中止/进行中</span>" } },
+                    { "name": "hasRecord", "label": "录制状态", "type": "mapping", "map": { "true": "<span class='label label-info'>已录制</span>", "false": "<span class='label label-default'>未录制</span>" } },
+                    {
+                      "type": "operation",
+                      "label": "操作",
+                      "width": 220,
+                      "buttons": [
+                        { "type": "button", "label": "查看详情", "level": "link", "actionType": "link", "link": "/pages/executeLogDetail.html?id=${executeLogId}" },
+                        { "type": "button", "label": "删除录制", "level": "danger", "actionType": "ajax", "api": { "url": "http://127.0.0.1:8080/execute-log/delete", "method": "post", "data": { "executeLogId": "${executeLogId}", "deleteLog": false, "deleteRecord": true } }, "reload": "u:groupBatchDetailService" },
+                        { "type": "button", "label": "全部删除", "level": "danger", "actionType": "ajax", "confirmText": "确认删除日志和录制？", "api": { "url": "http://127.0.0.1:8080/execute-log/delete", "method": "post", "data": { "executeLogId": "${executeLogId}", "deleteLog": true, "deleteRecord": true } }, "reload": "u:groupBatchDetailService" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }
