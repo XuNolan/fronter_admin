@@ -6,9 +6,14 @@
   <title>执行组批量执行</title>
   <style>
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    .runner { display: flex; height: 100vh; }
-    .left { width: 40%; border-right: 1px solid #eee; padding: 10px; overflow: auto; }
-    .right { flex: 1; padding: 0; }
+    .runner { display: flex; height: 100vh; width: 100vw; }
+    /* 左侧 2/3 留白区域 */
+    .left { flex: 2; border-right: 1px solid #eee; background: #fafafa; }
+    /* 右侧 1/3 区域，纵向分为上下各 1/2 */
+    .right { flex: 1; display: flex; flex-direction: column; }
+    /* 信息 1/4，高度较小；日志 3/4，高度较大 */
+    .right-top { flex: 1; padding: 10px; overflow: auto; border-bottom: 1px solid #eee; }
+    .right-bottom { flex: 3; padding: 0; }
     .header { display:flex; justify-content: space-between; align-items:center; margin-bottom:8px; }
     .list { list-style: none; padding: 0; margin: 0; }
     .list li { padding: 8px; border-bottom: 1px solid #f0f0f0; display:flex; justify-content: space-between; }
@@ -17,26 +22,33 @@
     .status-running { color:#007bff; }
     .status-success { color:#28a745; }
     .status-error { color:#dc3545; }
-    iframe { border: 0; width: 100%; height: calc(100vh - 0px); }
+    .status-stopped { color:#ff8800; }
+    iframe { border: 0; width: 100%; height: 100%; }
+    .btn { padding: 6px 10px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; }
+    .btn:hover { background: #f5f5f5; }
   </style>
 </head>
 <body>
   <div class="runner">
-    <div class="left">
-      <div class="header">
-        <div>
-          <div>执行组ID: <span id="gid"></span></div>
-          <div>批次UUID: <span id="term"></span></div>
-          <div>录制: <span id="rec"></span></div>
-        </div>
-        <div>
-          <button id="stopBtn">终止</button>
-        </div>
-      </div>
-      <ul class="list" id="scriptList"></ul>
-    </div>
+    <div class="left"></div>
     <div class="right">
-      <iframe id="execFrame" src="about:blank"></iframe>
+      <div class="right-top">
+        <div class="header">
+          <div>
+            <div>执行组ID: <span id="gid"></span></div>
+            <div>批次UUID: <span id="term"></span></div>
+            <div>录制: <span id="rec"></span></div>
+          </div>
+          <div>
+            <button class="btn" id="backBtn">返回</button>
+            <button class="btn" id="stopBtn">终止</button>
+          </div>
+        </div>
+        <ul class="list" id="scriptList"></ul>
+      </div>
+      <div class="right-bottom">
+        <iframe id="execFrame" src="about:blank"></iframe>
+      </div>
     </div>
   </div>
 
@@ -55,6 +67,7 @@
 
     let queue = [];
     let currentIdx = -1;
+    let stopped = false;
 
     function setStatus(i, status){
       const li = listEl.children[i];
@@ -82,6 +95,7 @@
     }
 
     function runNext(){
+      if (stopped) return;
       currentIdx++;
       if(currentIdx >= queue.length){
         frameEl.src = 'about:blank';
@@ -105,8 +119,18 @@
     });
 
     document.getElementById('stopBtn').onclick = ()=>{
+      stopped = true;
+      // 标记当前和未执行的脚本为 stopped
+      for (let i = currentIdx; i < queue.length; i++) {
+        setStatus(i, 'stopped');
+      }
       frameEl.src = 'about:blank';
-      alert('已终止当前批次（手动）。');
+      alert('已终止当前批次。');
+    };
+
+    document.getElementById('backBtn').onclick = ()=>{
+      // 返回上一页（执行组详情）
+      window.history.back();
     };
 
     (async function init(){
