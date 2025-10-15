@@ -10,5 +10,19 @@
 <div id="websocketApp">
     <button>to replace</button>
 </div>
+<script>
+  // 批量执行编排器：监听子组件发来的 feature_end，向父窗口再转发（若本页被 iframe 嵌入）
+  window.addEventListener('message', function (e) {
+    if (!e || !e.data) return;
+    if (e.data.type === 'feature_end') {
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage(e.data, '*');
+        }
+      } catch (err) {}
+    }
+  });
+  // 允许通过 URL 参数 needRecorded 控制是否录制：本页不直接处理，由 TestComponents.vue 内部读取
+</script>
 </body>
 </html>

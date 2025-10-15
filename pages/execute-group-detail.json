@@ -192,11 +192,23 @@
               "label": "连续执行此组所有脚本",
               "level": "success",
               "size": "lg",
-              "actionType": "ajax",
-              "confirmText": "确认要顺序执行此组中的所有脚本吗？",
-              "api": {
-                "method": "post",
-                "url": "http://127.0.0.1:8080/execute-group/execute/${params.id}"
+              "actionType": "dialog",
+              "dialog": {
+                "title": "启动批量执行",
+                "body": [
+                  { "type": "switch", "name": "needRecorded", "label": "批量录制", "value": true },
+                  { "type": "alert", "level": "info", "body": "将按脚本顺序逐个执行，并在右侧实时显示当前脚本执行详情。" }
+                ],
+                "actions": [
+                  { "type": "button", "label": "取消", "actionType": "close" },
+                  {
+                    "type": "button",
+                    "label": "开始执行",
+                    "level": "primary",
+                    "actionType": "link",
+                    "link": "/pages/groupRunner.html?groupId=${params.id}&needRecorded=${needRecorded}"
+                  }
+                ]
               }
             },
             {

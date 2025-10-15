@@ -102,6 +102,7 @@ let scriptIdFromUrl;
 let needRecordedFromUrl;
 
 let webSocket;
+let featureEndedFlag = false;
 
 export default {
   setup(){
@@ -165,7 +166,9 @@ export default {
         msgType:"script_start",
         content:{
           "scriptId": getScriptId(),
-          "needRecorded": getNeedRecorded()
+          "needRecorded": getNeedRecorded(),
+          "executeGroupId": getExecuteGroupId(),
+          "executeTermId": getExecuteTermId()
         }
       };
       webSocket.send(JSON.stringify(startFeatureRequest));
@@ -177,7 +180,27 @@ export default {
         this.handleKarateFeatureInfos(JSON.parse(message.content)['scenarioInfos']);
       }else if(message && message.msgType==="executeInfos"){
         // console.log(JSON.parse(message.content));
-        this.handleExecuteInfos(JSON.parse(message.content));
+        const contentRaw = message.content;
+        const contentObj = (typeof contentRaw === 'string') ? (function(){ try{ return JSON.parse(contentRaw); }catch(e){ return null; } })() : contentRaw;
+        if (contentObj && !(contentObj.type === 'feature_end' || contentObj.msgType === 'feature_end')) {
+          this.handleExecuteInfos(contentObj);
+        }
+        // 当服务端以 executeInfos 通道发送 feature_end 时，向父窗口上报，便于批量编排推进
+        try{
+          const payload = contentObj != null ? contentObj : JSON.parse(message.content);
+          if(payload && (payload.type === 'feature_end' || payload.msgType === 'feature_end')){
+            featureEndedFlag = true;
+            // 批量执行（iframe）仅向父窗口汇报，不弹窗
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage({ type: 'feature_end', content: payload }, '*');
+            } else {
+              // 单次执行在本页提示
+              const status = typeof payload.status === 'number' ? payload.status : null;
+              const statusText = status === 0 ? '成功' : (status === 1 ? '失败' : '中止/进行中');
+              window.alert(`脚本执行已结束：${statusText}`);
+            }
+          }
+        }catch(e){}
       }
     }
     webSocket.onerror = (error) => {
@@ -185,6 +208,12 @@ export default {
     };
     webSocket.onclose = () => {
       console.log('WebSocket connection closed');
+      // 单页兜底提示：若未捕捉到 feature_end，但连接已关闭，也提示一次
+      if (!(window.parent && window.parent !== window)) {
+        if (!featureEndedFlag) {
+          window.alert('脚本执行已结束');
+        }
+      }
     };
 
   },
@@ -299,6 +328,17 @@ function getNeedRecorded(){
   const urlParams = new URLSearchParams(window.location.search);
   const needRecorded = urlParams.get('needRecorded');
   return needRecorded === 'true';
+}
+
+function getExecuteGroupId(){
+  const urlParams = new URLSearchParams(window.location.search);
+  const gid = urlParams.get('executeGroupId');
+  return gid ? Number(gid) : null;
+}
+
+function getExecuteTermId(){
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('executeTermId');
 }
 
 async function fetchScriptBaseInfo(){
