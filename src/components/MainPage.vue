@@ -39,7 +39,8 @@ export default {
                   "label": "新增用例",
                   "url": "/usecase/new",
                   "icon": "fa fa-plus",
-                  "schemaApi": "get:/pages/usecase-new.json"
+                  "schemaApi": "get:/pages/usecase-new.json",
+                  "visible": false
                 },
                 {
                   "label": "用例详情",
@@ -56,7 +57,8 @@ export default {
                   "label": "新增执行组",
                   "url": "/execute-group/new",
                   "icon": "fa fa-plus",
-                  "schemaApi": "get:/pages/execute-group-new.json"
+                  "schemaApi": "get:/pages/execute-group-new.json",
+                  "visible": false
                 },
                 {
                   "label": "执行组详情",
@@ -77,6 +79,7 @@ export default {
                 {
                   "label": "新建压测任务",
                   "url": "/pressure/new",
+                  "icon": "fa fa-plus",
                   "schema": {
                     "type": "page",
                     "body": {
@@ -94,6 +97,7 @@ export default {
                 },
                 {
                     "label": "压测任务详情",
+                    "icon": "fa fa-list",
                     "type": "page",
                     "body": {
                       "type": "iframe",
