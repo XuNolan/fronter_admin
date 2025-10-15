@@ -26,6 +26,12 @@
                   "width": 80
                 },
                 {
+                  "name": "scriptId",
+                  "label": "脚本ID",
+                  "type": "text",
+                  "width": 80
+                },
+                {
                   "name": "usecaseName",
                   "label": "用例名",
                   "type": "text"
@@ -249,14 +255,46 @@
                       "type": "button",
                       "label": "删除",
                       "level": "danger",
-                      "confirmText": "确认删除该批次的所有关联记录？",
-                      "actionType": "ajax",
-                      "api": {
-                        "url": "http://127.0.0.1:8080/execute-group/batch/delete",
-                        "method": "post",
-                        "data": { "groupId": "${params.id}", "executeTermId": "${executeTermId}" }
-                      },
-                      "reload": "u:groupBatchCrud"
+                      "actionType": "dialog",
+                      "dialog": {
+                        "title": "危险操作确认",
+                        "body": [
+                          { "type": "alert", "body": "会删除当前执行批次下所有日志记录和所有录制记录，且不可恢复。", "level": "danger" },
+                          {
+                            "type": "form",
+                            "wrapWithPanel": false,
+                            "mode": "horizontal",
+                            "actions": [
+                              {
+                                "type": "button",
+                                "label": "取消",
+                                "actionType": "close"
+                              },
+                              {
+                                "type": "button",
+                                "label": "确认删除",
+                                "level": "danger",
+                                "actionType": "ajax",
+                                "api": {
+                                  "url": "http://127.0.0.1:8080/execute-group/batch/delete",
+                                  "method": "post",
+                                  "data": { "groupId": "${params.id}", "executeTermId": "${executeTermId}" }
+                                },
+                                "onEvent": {
+                                  "success": {
+                                    "actions": [
+                                      { "actionType": "closeDialog" },
+                                      { "componentId": "u:groupBatchCrud", "actionType": "reload" },
+                                      { "componentId": "u:groupBatchDetailService", "actionType": "setValue", "args": { "value": { "executeTermId": null } } },
+                                      { "componentId": "u:groupBatchDetailService", "actionType": "reload" }
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
                     }
                   ]
                 }
@@ -286,6 +324,8 @@
                   "syncLocation": false,
                   "columns": [
                     { "name": "executeLogId", "label": "日志ID", "type": "text", "width": 70 },
+                    { "name": "scriptId", "label": "脚本ID", "type": "text", "width": 70 },
+                    { "name": "scriptName", "label": "脚本名", "type": "tpl", "tpl": "${scriptName || '-'}", "width": 140 },
                     { "name": "created", "label": "测试时间", "type": "tpl", "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}", "width": 160 },
                     { "name": "statusText", "label": "执行状态", "type": "mapping", "map": { "成功": "<span class='label label-success'>成功</span>", "失败": "<span class='label label-danger'>失败</span>", "中止/进行中": "<span class='label label-warning'>中止/进行中</span>" } },
                     { "name": "hasRecord", "label": "录制状态", "type": "mapping", "map": { "true": "<span class='label label-info'>已录制</span>", "false": "<span class='label label-default'>未录制</span>" } },
