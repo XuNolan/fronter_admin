@@ -255,45 +255,22 @@
                       "type": "button",
                       "label": "删除",
                       "level": "danger",
-                      "actionType": "dialog",
-                      "dialog": {
-                        "title": "危险操作确认",
-                        "body": [
-                          { "type": "alert", "body": "会删除当前执行批次下所有日志记录和所有录制记录，且不可恢复。", "level": "danger" },
-                          {
-                            "type": "form",
-                            "wrapWithPanel": false,
-                            "mode": "horizontal",
-                            "actions": [
-                              {
-                                "type": "button",
-                                "label": "取消",
-                                "actionType": "close"
-                              },
-                              {
-                                "type": "button",
-                                "label": "确认删除",
-                                "level": "danger",
-                                "actionType": "ajax",
-                                "api": {
-                                  "url": "http://127.0.0.1:8080/execute-group/batch/delete",
-                                  "method": "post",
-                                  "data": { "groupId": "${params.id}", "executeTermId": "${executeTermId}" }
-                                },
-                                "onEvent": {
-                                  "success": {
-                                    "actions": [
-                                      { "actionType": "closeDialog" },
-                                      { "componentId": "u:groupBatchCrud", "actionType": "reload" },
-                                      { "componentId": "u:groupBatchDetailService", "actionType": "setValue", "args": { "value": { "executeTermId": null } } },
-                                      { "componentId": "u:groupBatchDetailService", "actionType": "reload" }
-                                    ]
-                                  }
-                                }
-                              }
-                            ]
-                          }
-                        ]
+                      "actionType": "ajax",
+                      "confirmText": "会删除当前执行批次下所有日志记录和所有录制记录，且不可恢复。确认删除吗？",
+                      "api": {
+                        "url": "http://127.0.0.1:8080/execute-group/batch/delete",
+                        "method": "post",
+                        "dataType": "form",
+                        "data": { "groupId": "${params.id}", "executeTermId": "${executeTermId}" }
+                      },
+                      "onEvent": {
+                        "success": {
+                          "actions": [
+                            { "componentId": "u:groupBatchCrud", "actionType": "reload" },
+                            { "componentId": "u:groupBatchDetailService", "actionType": "setValue", "args": { "value": { "executeTermId": null } } },
+                            { "componentId": "u:groupBatchDetailService", "actionType": "reload" }
+                          ]
+                        }
                       }
                     }
                   ]
