@@ -5,11 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>执行日志详情</title>
   <style>
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    .container { padding: 16px; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; }
+    .main-container { display: flex; height: 100vh; gap: 16px; padding: 16px; box-sizing: border-box; }
+    .video-section { flex: 2; display: flex; flex-direction: column; }
+    .log-section { flex: 1; overflow-y: auto; }
     .card { background: #fff; border-radius: 6px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .card h3 { margin: 0 0 10px; font-size: 16px; }
-    .info-row { margin-bottom: 8px; display: flex; gap: 8px; color: #333; }
+    .video-card { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .video-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 4px; overflow: hidden; position: relative; }
+    .video-player { width: 100%; height: 100%; object-fit: contain; }
+    .video-placeholder { color: #666; text-align: center; padding: 20px; }
+    .video-error { color: #dc3545; text-align: center; padding: 20px; background: #fff5f5; border-radius: 4px; margin: 20px; }
+    .video-controls { margin-top: 12px; }
+    .info-row { margin-bottom: 8px; display: flex; gap: 8px; color: #333; font-size: 13px; }
     .label { color: #666; width: 90px; flex-shrink: 0; }
     pre { margin: 0; padding: 10px; background: #f8f9fa; border-radius: 4px; overflow-x: auto; }
     .scenario { margin-bottom: 16px; }
@@ -24,6 +32,8 @@
     .code{ font-family: Monaco, Consolas, "Courier New", monospace; font-size: 13px; white-space: pre-wrap; }
     .timing{ display:flex; gap:12px; font-size:12px; color:#666; margin-top:6px; }
     .err{ margin-top:8px; background:#fff5f5; color:#dc3545; padding:10px; border-radius:4px; font-size:12px; }
+    .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -59,13 +69,24 @@
 
     const Detail = {
       setup(){
-        const state = reactive({ base:{}, steps:[], loading:true, error:'', tick: 0 });
+        const state = reactive({ 
+          base:{}, 
+          steps:[], 
+          loading:true, 
+          error:'', 
+          tick: 0,
+          videoUrl: '',
+          videoLoading: true,
+          videoError: '',
+          hasVideo: false,
+          converting: false
+        });
         const id = getQuery('id');
+        
+        // 加载日志详情
         (async ()=>{
           try{
-            console.log('Fetching log detail for id:', id);
             const data = await fetchLogDetail(id);
-            console.log('Received data:', data);
             // 归一化常用字段，兼容 _ 前缀
             state.base = {
               id: pick(data, 'id', '_id'),
@@ -73,12 +94,21 @@
               statusText: pick(data, 'statusText', '_statusText'),
               executeTime: pick(data, 'executeTime', '_executeTime'),
               created: pick(data, 'created', '_created'),
+              hasRecord: pick(data, 'hasRecord', '_hasRecord') || false
             };
+            
+            // 如果有录制记录，设置视频URL
+            if (state.base.hasRecord) {
+              state.videoUrl = `http://127.0.0.1:8080/execute-log/video/${id}`;
+              state.hasVideo = true;
+            } else {
+              state.videoError = '该执行日志没有关联的录制视频';
+            }
+            state.videoLoading = false;
+            
             // logData 为 JSON 数组字符串（afterStep 累计），每项包括 stepString 与 detail(ExecuteResultInfo)
             const logDataStr = pick(data, 'logData', '_logData') || '[]';
-            console.log('Log data string:', logDataStr);
             const arr = JSON.parse(logDataStr);
-            console.log('Parsed log data array:', arr);
             state.steps = arr.map(item=>{
               const d = item.detail || {};
               return {
@@ -94,12 +124,12 @@
                 raw: d
               }
             });
-            console.log('Processed steps:', state.steps);
             // 强制触发一次更新
             state.tick++;
           }catch(e){ 
-            console.error('Error fetching log detail:', e);
-            state.error = e.message; 
+            state.error = e.message;
+            state.videoError = '加载日志详情失败';
+            state.videoLoading = false;
           }
           finally{ state.loading = false; }
         })();
@@ -124,36 +154,146 @@
         function fmtDate(ts){ if(!ts) return 'N/A'; const d=new Date(ts*1000); return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
         function fmtDur(nanos){ if(!nanos) return 'N/A'; const ms=nanos/1e6; if(ms<1000) return `${ms.toFixed(0)}ms`; const s=ms/1000; if(s<60) return `${s.toFixed(1)}s`; const m=Math.floor(s/60); return `${m}m ${(s%60).toFixed(0)}s`; }
 
-        return { state, cls, ico, fmtTime, fmtDate, fmtDur }
+        // 视频错误处理函数
+        function handleVideoError(event) {
+          const video = event.target;
+          const error = video.error;
+          let errorMessage = '视频加载失败';
+          
+          if (error) {
+            switch (error.code) {
+              case 1:
+                errorMessage = '视频加载被中止';
+                break;
+              case 2:
+                errorMessage = '网络错误导致视频加载失败';
+                break;
+              case 3:
+                errorMessage = '视频解码错误 - 可能是编码格式不兼容';
+                break;
+              case 4:
+                errorMessage = '不支持的视频格式 - 浏览器可能不支持AVI格式';
+                break;
+              default:
+                errorMessage = `视频加载失败 (错误代码: ${error.code})`;
+            }
+          }
+          
+          // 记录错误信息用于调试
+          console.error('视频加载错误:', errorMessage);
+          
+          // 如果是格式不支持，提供解决建议
+          if (error && error.code === 4) {
+            errorMessage += '\n\n建议：\n1. 点击下方按钮转换为MP4格式\n2. 尝试使用Chrome或Firefox浏览器\n3. 检查视频文件是否完整';
+          }
+          
+          state.videoError = errorMessage;
+        }
+        
+        // 转换视频函数
+        async function convertVideo() {
+          if (state.converting) return;
+          
+          try {
+            state.converting = true;
+            
+            const response = await fetch(`/api/execute-log/convert/${state.base.id}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              // 转换成功，重新加载视频
+              state.videoError = '';
+              state.videoLoading = true;
+              state.hasVideo = true;
+              state.videoUrl = `/api/execute-log/video/${state.base.id}?t=${Date.now()}`;
+            } else {
+              state.videoError = `转换失败: ${result.message}`;
+            }
+            
+          } catch (error) {
+            state.videoError = `转换失败: ${error.message}`;
+          } finally {
+            state.converting = false;
+          }
+        }
+
+
+        return { state, cls, ico, fmtTime, fmtDate, fmtDur, handleVideoError, convertVideo }
       },
       template: `
-        <div class="container">
-          <div class="card">
-            <h3>日志信息</h3>
-            <div class="info-row"><span class="label">日志ID</span><span>{{state.base.id || '-'}}</span></div>
-            <div class="info-row"><span class="label">执行状态</span><span>{{state.base.statusText || state.base.status}}</span></div>
-            <div class="info-row"><span class="label">执行时长</span><span>{{state.base.executeTime}} ms</span></div>
-            <div class="info-row"><span class="label">创建时间</span><span>{{fmtDate(state.base.created)}}</span></div>
+        <div class="main-container">
+          <!-- 左侧视频区域 (2/3) -->
+          <div class="video-section">
+            <div class="card video-card">
+              <h3>录制回放</h3>
+              <div class="video-wrapper">
+                <div v-if="state.videoLoading" class="video-placeholder">
+                  <div class="loading-spinner"></div>
+                  <p style="margin-top:10px">加载中...</p>
+                </div>
+                <div v-else-if="state.videoError" class="video-error">
+                  <div style="white-space: pre-line;">{{ state.videoError }}</div>
+                  <div v-if="state.videoError.includes('不支持的视频格式')" style="margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 4px; font-size: 12px;">
+                    <strong>解决方案：</strong><br>
+                    1. <button @click="convertVideo" :disabled="state.converting" style="margin: 5px 0; padding: 8px 16px; background: #1976d2; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                      {{ state.converting ? '转换中...' : '转换为MP4格式' }}
+                     </button><br>
+                    2. <a :href="state.videoUrl" download style="color: #1976d2; text-decoration: underline;">下载原始AVI文件</a><br>
+                    3. 使用本地播放器（如VLC）打开下载的视频文件
+                  </div>
+                </div>
+                <video v-else-if="state.hasVideo" 
+                       class="video-player" 
+                       :src="state.videoUrl" 
+                       controls 
+                       preload="metadata"
+                       @error="handleVideoError"
+                >
+                  您的浏览器不支持视频播放。
+                </video>
+                <div v-else class="video-placeholder">
+                  无录制视频
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="card">
-            <h3>步骤详情</h3>
-            <div v-if="state.loading">加载中...</div>
-            <div v-else-if="state.error" class="err">错误: {{state.error}}</div>
-            <div v-else :key="state.tick">
-              <div v-if="state.steps.length === 0" class="info-row">暂无步骤数据</div>
-              <div v-else>
-                <div v-for="s in state.steps" :key="s.scenarioIndex+'-'+s.stepIndex" class="step" :class="cls(s)">
-                  <div class="head">
-                    <span class="icon">{{ ico(s) }}</span>
-                    <span class="code">{{ s.stepString }}</span>
+          <!-- 右侧日志区域 (1/3) -->
+          <div class="log-section">
+            <div class="card">
+              <h3>日志信息</h3>
+              <div class="info-row"><span class="label">日志ID</span><span>{{state.base.id || '-'}}</span></div>
+              <div class="info-row"><span class="label">执行状态</span><span>{{state.base.statusText || state.base.status}}</span></div>
+              <div class="info-row"><span class="label">执行时长</span><span>{{state.base.executeTime}} ms</span></div>
+              <div class="info-row"><span class="label">创建时间</span><span>{{fmtDate(state.base.created)}}</span></div>
+              <div class="info-row"><span class="label">录制状态</span><span>{{state.base.hasRecord ? '有录制' : '无录制'}}</span></div>
+            </div>
+
+            <div class="card">
+              <h3>步骤详情</h3>
+              <div v-if="state.loading">加载中...</div>
+              <div v-else-if="state.error" class="err">错误: {{state.error}}</div>
+              <div v-else :key="state.tick">
+                <div v-if="state.steps.length === 0" class="info-row">暂无步骤数据</div>
+                <div v-else>
+                  <div v-for="s in state.steps" :key="s.scenarioIndex+'-'+s.stepIndex" class="step" :class="cls(s)">
+                    <div class="head">
+                      <span class="icon">{{ ico(s) }}</span>
+                      <span class="code">{{ s.stepString }}</span>
+                    </div>
+                    <div class="timing">
+                      <span>开始: {{ fmtTime(s.startTime) }}</span>
+                      <span>结束: {{ fmtTime(s.endTime) }}</span>
+                      <span>耗时: {{ fmtDur(s.durationNanos) }}</span>
+                    </div>
+                    <pre v-if="s.error" class="err"><code>{{ s.error }}</code></pre>
                   </div>
-                  <div class="timing">
-                    <span>开始: {{ fmtTime(s.startTime) }}</span>
-                    <span>结束: {{ fmtTime(s.endTime) }}</span>
-                    <span>耗时: {{ fmtDur(s.durationNanos) }}</span>
-                  </div>
-                  <pre v-if="s.error" class="err"><code>{{ s.error }}</code></pre>
                 </div>
               </div>
             </div>
