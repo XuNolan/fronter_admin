@@ -1096,7 +1096,10 @@
                           "deleteRecord": true
                         }
                       },
-                      "reload": "u:executeLogService"
+                      "reload": "u:executeLogService",
+                      "feedback": {
+                        "title": "操作成功"
+                      }
                     },
                     {
                       "type": "button",
@@ -1113,7 +1116,10 @@
                           "deleteRecord": true
                         }
                       },
-                      "reload": "u:executeLogService"
+                      "reload": "u:executeLogService",
+                      "feedback": {
+                        "title": "操作成功"
+                      }
                     }
                   ]
                 }
