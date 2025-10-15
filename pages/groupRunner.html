@@ -100,6 +100,8 @@
       if(currentIdx >= queue.length){
         frameEl.src = 'about:blank';
         alert('批量执行完成');
+        // 返回执行组详情页
+        window.location.href = `/execute-group/detail/${groupId}`;
         return;
       }
       const it = queue[currentIdx];
@@ -129,8 +131,8 @@
     };
 
     document.getElementById('backBtn').onclick = ()=>{
-      // 返回上一页（执行组详情）
-      window.history.back();
+      // 跳转到执行组详情页
+      window.location.href = `/execute-group/detail/${groupId}`;
     };
 
     (async function init(){
