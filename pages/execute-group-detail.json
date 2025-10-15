@@ -226,6 +226,7 @@
                 { "name": "executeTermId", "label": "执行批次UUID", "type": "tpl", "tpl": "${executeTermId}" },
                 { "name": "created", "label": "开始时间", "type": "tpl", "tpl": "${created | date:YYYY-MM-DD HH\\:mm\\:ss}", "width": 160 },
                 { "name": "count", "label": "脚本数", "type": "text", "width": 70 },
+                { "name": "successCount", "label": "成功数", "type": "text", "width": 70 },
                 {
                   "type": "operation",
                   "label": "操作",
