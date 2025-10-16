@@ -154,13 +154,13 @@ export default {
   },
   mounted() {
     if ("WebSocket" in window) {
-      webSocket = new WebSocket("ws://127.0.0.1:8080/websocket");//创建socket对象
+      this.webSocket = new WebSocket("ws://127.0.0.1:8080/websocket");//创建socket对象
     } else {
       console.log(JSON.stringify({message: '该浏览器不支持websocket!', type: 'warning'}));
       throw new Error("websocket unsupported");
     }
     //基于websocket提示对端开始执行脚本
-    webSocket.onopen = function(){
+    this.webSocket.onopen = function(){
       console.log('WebSocket connection opened')
       let startFeatureRequest = {
         msgType:"script_start",
@@ -171,10 +171,11 @@ export default {
           "executeTermId": getExecuteTermId()
         }
       };
-      webSocket.send(JSON.stringify(startFeatureRequest));
-    };
-    webSocket.onmessage = (event) => {
+      this.send(JSON.stringify(startFeatureRequest));
+    }.bind(this.webSocket);
+    this.webSocket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      try{ console.log('WS msgType:', message && message.msgType, 'raw:', message); }catch(e){}
       if(message && message.msgType==="karateFeatureInfos"){
         // console.log(message.content);//json content；
         this.handleKarateFeatureInfos(JSON.parse(message.content)['scenarioInfos']);
@@ -201,12 +202,18 @@ export default {
             }
           }
         }catch(e){}
+      } else if (message && message.msgType === 'human_input_request') {
+        console.log('received human_input_request');
+        try{
+          const payload = typeof message.content === 'string' ? JSON.parse(message.content) : message.content;
+          this.openHumanInputModal(payload);
+        }catch(e){ console.error('parse human_input_request failed', e); }
       }
     }
-    webSocket.onerror = (error) => {
+    this.webSocket.onerror = (error) => {
       console.error('WebSocket error: ', error);
     };
-    webSocket.onclose = () => {
+    this.webSocket.onclose = () => {
       console.log('WebSocket connection closed');
       // 单页兜底提示：若未捕捉到 feature_end，但连接已关闭，也提示一次
       if (!(window.parent && window.parent !== window)) {
@@ -218,6 +225,40 @@ export default {
 
   },
   methods:{
+    openHumanInputModal(payload){
+      const { requestId, prompt, type, options, defaultValue, timeoutMs } = payload || {};
+      console.log('[' + new Date().toISOString() + '] openHumanInputModal called with requestId:', requestId);
+      let value = null;
+      
+      if (type === 'confirm') {
+        // 是/否确认弹窗
+        const confirmed = window.confirm(prompt || '请确认');
+        value = confirmed ? 'true' : 'false';
+      } else {
+        // 文本输入弹窗（默认）
+        value = window.prompt(prompt || '请输入参数', defaultValue || '');
+      }
+      
+      console.log('[' + new Date().toISOString() + '] user input completed, value:', value);
+      const resp = { msgType: 'human_input_response', content: { requestId, value } };
+      console.log('sending human_input_response:', resp);
+      console.log('webSocket state:', this.webSocket ? this.webSocket.readyState : 'null');
+      
+      try{ 
+        if (this.webSocket) {
+          if (this.webSocket.readyState === WebSocket.OPEN) {
+            this.webSocket.send(JSON.stringify(resp));
+            console.log('human_input_response sent successfully');
+          } else {
+            console.error('webSocket not open, readyState:', this.webSocket.readyState);
+          }
+        } else {
+          console.error('webSocket is null, cannot send response');
+        }
+      }catch(e){
+        console.error('failed to send human_input_response:', e);
+      }
+    },
     handleKarateFeatureInfos(content){
       for(let i = 0;i<content.length; i++){
         console.log(content[i]);
