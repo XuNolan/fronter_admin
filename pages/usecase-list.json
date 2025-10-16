@@ -56,8 +56,7 @@
                   "label": "脚本ID",
                   "type": "text",
                   "id": "u:scriptIdColumn",
-                  "placeholder": "-",
-                  "visible": false
+                  "placeholder": "-"
                 },
                 {
                   "name": "usecaseName",
