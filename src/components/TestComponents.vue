@@ -229,10 +229,21 @@ export default {
       }
     },
     handleExecuteInfos(content) {
-      const {scenarioIndex, stepIndex, status, durationNanos, startTime, endTime, error, aborted} = content;
+      let scenarioIndex, stepIndex, payload;
+      if (content && content.detail) {
+        // 新格式
+        scenarioIndex = content.scenarioIndex;
+        stepIndex = content.stepIndex;
+        payload = content.detail;
+      } else {
+        // 旧格式
+        scenarioIndex = content.scenarioIndex;
+        stepIndex = content.stepIndex;
+        payload = content;
+      }
       // 更新该步骤的执行状态
-      console.log(content);
-      this.executeResults.set(`${scenarioIndex}-${stepIndex}`, content);
+      console.log('update step', `${scenarioIndex}-${stepIndex}`, payload);
+      this.executeResults.set(`${scenarioIndex}-${stepIndex}`, payload);
       // 自动滚动到底部
       this.$nextTick(() => {
         const container = document.querySelector('.test-container');
