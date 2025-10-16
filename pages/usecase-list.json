@@ -52,6 +52,14 @@
                   "placeholder": "-"
                 },
                 {
+                  "name": "scriptId",
+                  "label": "脚本ID",
+                  "type": "text",
+                  "id": "u:scriptIdColumn",
+                  "placeholder": "-",
+                  "visible": false
+                },
+                {
                   "name": "usecaseName",
                   "label": "用例名",
                   "type": "text",
