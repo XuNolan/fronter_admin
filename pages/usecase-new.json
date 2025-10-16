@@ -107,22 +107,6 @@
       "actions": [
         {
           "type": "button",
-          "label": "测试",
-          "onEvent": {
-            "click": {
-              "actions": [
-                {
-                  "actionType": "submit",
-                  "componentId": "u:458aa437ac9b"
-                }
-              ]
-            }
-          },
-          "level": "primary",
-          "id": "u:3ce3b2380a95"
-        },
-        {
-          "type": "button",
           "label": "提交",
           "onEvent": {
             "click": {

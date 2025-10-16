@@ -39,8 +39,8 @@ export default {
                   "label": "新增用例",
                   "url": "/usecase/new",
                   "icon": "fa fa-plus",
-                  "schemaApi": "get:/pages/usecase-new.json",
-                  "visible": false
+                  "schemaApi": "get:/pages/usecase-new.json"
+                  // "visible": false
                 },
                 {
                   "label": "用例详情",
@@ -57,8 +57,7 @@ export default {
                   "label": "新增执行组",
                   "url": "/execute-group/new",
                   "icon": "fa fa-plus",
-                  "schemaApi": "get:/pages/execute-group-new.json",
-                  "visible": false
+                  "schemaApi": "get:/pages/execute-group-new.json"
                 },
                 {
                   "label": "执行组详情",

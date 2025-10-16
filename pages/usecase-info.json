@@ -842,7 +842,7 @@
                               "style": { "width": "33.33vw" },
                               "body": {
                                 "type": "iframe",
-                                "src": "/pages/testPage.html?scriptId=${id}&needRecorded=${needRecorded|default:false}",
+                                "src": "/pages/testPage.html?scriptId=${scriptId}&needRecorded=${needRecorded|default:false}",
                                 "height": "80vh",
                                 "className": "border-0",
                                 "style": { "width": "100%" }
